@@ -1,16 +1,23 @@
-const broker = "wss://broker.hivemq.com:8080/mqtt"; // ✅ Cambiado a WSS
+// === Verificación inicial (depuración) ===
+console.log("🟢 main.js cargado");
+
+// === Configuración MQTT con WSS (seguro para GitHub Pages) ===
+const broker = "wss://test.mosquitto.org:8081/mqtt"; // ✅ Funciona en HTTPS
+// Alternativa: Usa tu propio broker en HiveMQ Cloud si este falla
+
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
+// Conexión MQTT
 const client = mqtt.connect(broker, {
   clientId: clientId,
   clean: true,
   connectTimeout: 10000,
   reconnectPeriod: 3000,
-  // Necesario para navegadores con WSS
   protocolVersion: 4, // MQTT 3.1.1
+  rejectUnauthorized: false // Necesario para algunos brokers públicos
 });
 
-// === Temas MQTT que usa tu estación ===
+// === Temas MQTT de tu estación ===
 const topics = {
   temp: "horus/vvb/temperatura",
   hum: "horus/vvb/humedad",
@@ -24,11 +31,10 @@ const topics = {
   lluvia: "horus/vvb/lluvia"
 };
 
-// === Mapeo de elementos del DOM (evita errores de null) ===
+// === Mapeo de elementos del DOM (evita errores si no existen) ===
 const elements = {};
 Object.keys(topics).forEach(key => {
-  // Si el ID es windSpeed, usamos 'wind' como ID en el HTML
-  const id = key === 'windSpeed' ? 'wind' : key;
+  const id = key === 'windSpeed' ? 'wind' : key; // mapea windSpeed → wind
   const el = document.getElementById(id);
   if (el) {
     elements[key] = el;
@@ -37,9 +43,9 @@ Object.keys(topics).forEach(key => {
   }
 });
 
-// === Conexión MQTT exitosa ===
+// === Eventos MQTT ===
 client.on("connect", () => {
-  console.log("✅ Conectado a broker.hivemq.com:8000");
+  console.log("✅ Conectado al broker MQTT:", broker);
   Object.values(topics).forEach(topic => {
     client.subscribe(topic, (err) => {
       if (err) {
@@ -51,46 +57,43 @@ client.on("connect", () => {
   });
 });
 
-// === Recibir mensajes MQTT ===
 client.on("message", (topic, payload) => {
   const value = payload.toString().trim();
   if (!value) return;
 
-  // Busca qué sensor corresponde al tema
   const key = Object.keys(topics).find(k => topics[k] === topic);
   if (!key) return;
 
   const el = elements[key];
   if (!el) return;
 
-  // Formato específico por tipo de dato
-  if (key === "temp") {
-    el.textContent = `${value} °C`;
-  } else if (key === "press") {
-    el.textContent = `${value} hPa`;
-  } else if (key === "windSpeed") {
-    el.textContent = `${value} km/h`;
-  } else if (key === "windDir") {
-    el.textContent = `${value} °`;
-  } else if (key === "gas") {
-    el.textContent = `${value} kΩ`;
-  } else if (key === "lluvia") {
-    el.textContent = `${value} mm`;
-  } else {
-    el.textContent = value;
-  }
+  // Formato específico por tipo
+  if (key === "temp") el.textContent = `${value} °C`;
+  else if (key === "press") el.textContent = `${value} hPa`;
+  else if (key === "windSpeed") el.textContent = `${value} km/h`;
+  else if (key === "windDir") el.textContent = `${value} °`;
+  else if (key === "gas") el.textContent = `${value} kΩ`;
+  else if (key === "lluvia") el.textContent = `${value} mm`;
+  else el.textContent = value;
 });
 
-// === Manejo de errores MQTT ===
 client.on("error", (err) => {
   console.error("❌ Error MQTT:", err.message || err);
 });
 
-// === Modo claro/oscuro con persistencia ===
+client.on("reconnect", () => {
+  console.log("🔁 Reconectando al broker...");
+});
+
+client.on("offline", () => {
+  console.warn("🌐 Cliente desconectado (modo offline)");
+});
+
+// === Modo claro/oscuro con localStorage ===
 const checkbox = document.querySelector(".theme-switch__checkbox");
 const body = document.body;
 
-// Cargar el tema guardado al iniciar
+// Cargar tema guardado
 function loadTheme() {
   const isDark = localStorage.getItem("darkMode") === "true";
   if (isDark) {
@@ -103,7 +106,7 @@ function loadTheme() {
   updateBackgroundEffects();
 }
 
-// Guardar y aplicar tema
+// Aplicar tema y guardarlo
 function setTheme(isDark) {
   if (isDark) {
     body.classList.replace("light-mode", "dark-mode");
@@ -115,23 +118,11 @@ function setTheme(isDark) {
   updateBackgroundEffects();
 }
 
-// Inicializar tema al cargar la página
-document.addEventListener("DOMContentLoaded", loadTheme);
-
-// Escuchar cambios en el switch
-if (checkbox) {
-  checkbox.addEventListener("change", (e) => {
-    setTheme(e.target.checked);
-  });
-}
-
-// === Efectos visuales: partículas (claro) y lluvia (oscuro) ===
+// Efectos visuales: partículas o lluvia
 function updateBackgroundEffects() {
-  // Eliminar efectos anteriores
   document.querySelector('.particles')?.remove();
   document.querySelector('.rain')?.remove();
 
-  // Aplicar el efecto según el modo
   if (body.classList.contains('light-mode')) {
     createParticles();
   } else {
@@ -139,11 +130,9 @@ function updateBackgroundEffects() {
   }
 }
 
-// Crear partículas flotantes (modo claro)
 function createParticles() {
   const particles = document.createElement('div');
   particles.classList.add('particles');
-
   for (let i = 0; i < 40; i++) {
     const dot = document.createElement('div');
     dot.classList.add('particle');
@@ -153,15 +142,12 @@ function createParticles() {
     dot.style.animationDuration = (Math.random() * 10 + 5) + 's';
     particles.appendChild(dot);
   }
-
   document.body.appendChild(particles);
 }
 
-// Crear efecto de lluvia (modo oscuro)
 function createRain() {
   const rain = document.createElement('div');
   rain.classList.add('rain');
-
   for (let i = 0; i < 30; i++) {
     const drop = document.createElement('div');
     drop.classList.add('raindrop');
@@ -170,8 +156,11 @@ function createRain() {
     drop.style.opacity = Math.random() * 0.6 + 0.4;
     rain.appendChild(drop);
   }
-
   document.body.appendChild(rain);
 }
 
-
+// === Inicialización al cargar la página ===
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("📄 Página cargada, inicializando...");
+  loadTheme(); // Carga tema y aplica efectos
+});
