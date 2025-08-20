@@ -1,5 +1,5 @@
 // === Configuración MQTT ===
-const broker = "ws://broker.hivemq.com:8000/mqtt";
+const broker = "wss://broker.hivemq.com:8000/mqtt";
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
 // Conexión MQTT
@@ -173,3 +173,4 @@ function createRain() {
 
   document.body.appendChild(rain);
 }
+
