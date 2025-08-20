@@ -1,13 +1,13 @@
-// === Configuración MQTT ===
-const broker = "wss://broker.hivemq.com:8000/mqtt";
+const broker = "wss://broker.hivemq.com:8080/mqtt"; // ✅ Cambiado a WSS
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
-// Conexión MQTT
 const client = mqtt.connect(broker, {
   clientId: clientId,
   clean: true,
   connectTimeout: 10000,
   reconnectPeriod: 3000,
+  // Necesario para navegadores con WSS
+  protocolVersion: 4, // MQTT 3.1.1
 });
 
 // === Temas MQTT que usa tu estación ===
@@ -173,4 +173,5 @@ function createRain() {
 
   document.body.appendChild(rain);
 }
+
 
