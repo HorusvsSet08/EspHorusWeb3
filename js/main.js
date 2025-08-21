@@ -1,18 +1,9 @@
-// === Verificación de carga ===
-console.log("🟢 main.js cargado");
-
-// === Configuración MQTT (WSS para GitHub Pages) ===
+// === Configuración MQTT ===
 const broker = "wss://broker.hivemq.com:8884/mqtt";
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
-// Conexión MQTT
-const client = mqtt.connect(broker, {
-  clientId: clientId,
-  clean: true,
-  connectTimeout: 10000,
-  reconnectPeriod: 3000,
-  protocolVersion: 4
-});
+let client;
+let body, checkbox;
 
 // === Temas MQTT ===
 const topics = {
@@ -36,45 +27,73 @@ Object.keys(topics).forEach(key => {
   if (el) elements[key] = el;
 });
 
-// === Conexión MQTT ===
-client.on("connect", () => {
-  console.log("✅ Conectado a broker.hivemq.com:8884");
-  Object.values(topics).forEach(topic => {
-    client.subscribe(topic, (err) => {
-      if (err) {
-        console.error("❌ Error al suscribirse a:", topic);
-      } else {
-        console.log("📌 Suscrito a:", topic);
-      }
+// === Inicializar cuando el DOM esté listo ===
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("📄 Página cargada, inicializando...");
+
+  // Aseguramos que body y checkbox existan
+  body = document.body;
+  checkbox = document.querySelector(".theme-switch__checkbox");
+
+  if (!body) {
+    console.error("❌ <body> no encontrado");
+    return;
+  }
+
+  // === Conexión MQTT ===
+  client = mqtt.connect(broker, {
+    clientId: clientId,
+    clean: true,
+    connectTimeout: 10000,
+    reconnectPeriod: 3000,
+    protocolVersion: 4
+  });
+
+  client.on("connect", () => {
+    console.log("✅ Conectado a broker.hivemq.com:8884");
+    Object.values(topics).forEach(topic => {
+      client.subscribe(topic, (err) => {
+        if (err) {
+          console.error("❌ Error al suscribirse a:", topic);
+        } else {
+          console.log("📌 Suscrito a:", topic);
+        }
+      });
     });
   });
+
+  client.on("message", (topic, payload) => {
+    const value = payload.toString().trim();
+    if (!value) return;
+
+    const key = Object.keys(topics).find(k => topics[k] === topic);
+    const el = elements[key];
+    if (!el) return;
+
+    if (key === "temp") el.textContent = `${value} °C`;
+    else if (key === "press") el.textContent = `${value} hPa`;
+    else if (key === "windSpeed") el.textContent = `${value} km/h`;
+    else if (key === "windDir") el.textContent = `${value} °`;
+    else if (key === "gas") el.textContent = `${value} kΩ`;
+    else if (key === "lluvia") el.textContent = `${value} mm`;
+    else el.textContent = value;
+  });
+
+  client.on("error", (err) => {
+    console.error("❌ Error MQTT:", err.message || err);
+  });
+
+  // === Modo claro/oscuro ===
+  loadTheme();
+
+  if (checkbox) {
+    checkbox.addEventListener("change", (e) => {
+      setTheme(e.target.checked);
+    });
+  }
 });
 
-client.on("message", (topic, payload) => {
-  const value = payload.toString().trim();
-  if (!value) return;
-
-  const key = Object.keys(topics).find(k => topics[k] === topic);
-  const el = elements[key];
-  if (!el) return;
-
-  if (key === "temp") el.textContent = `${value} °C`;
-  else if (key === "press") el.textContent = `${value} hPa`;
-  else if (key === "windSpeed") el.textContent = `${value} km/h`;
-  else if (key === "windDir") el.textContent = `${value} °`;
-  else if (key === "gas") el.textContent = `${value} kΩ`;
-  else if (key === "lluvia") el.textContent = `${value} mm`;
-  else el.textContent = value;
-});
-
-client.on("error", (err) => {
-  console.error("❌ Error MQTT:", err.message || err);
-});
-
-// === Modo claro/oscuro ===
-const checkbox = document.querySelector(".theme-switch__checkbox");
-const body = document.body;
-
+// === Funciones de tema ===
 function loadTheme() {
   const isDark = localStorage.getItem("darkMode") === "true";
   if (isDark) {
@@ -138,13 +157,3 @@ function createRain() {
   }
   document.body.appendChild(rain);
 }
-
-// === Inicializar ===
-document.addEventListener("DOMContentLoaded", () => {
-  loadTheme();
-  if (checkbox) {
-    checkbox.addEventListener("change", (e) => {
-      setTheme(e.target.checked);
-    });
-  }
-});
