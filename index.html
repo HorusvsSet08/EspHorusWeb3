@@ -2,18 +2,19 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Estación Meteorológica Horus</title>
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Cargar MQTT y main.js para que el modo oscuro funcione -->
+  <!-- Cargar mqtt.js y main.js para que el modo oscuro funcione al navegar -->
   <script src="https://unpkg.com/mqtt@4.6.1/dist/mqtt.js"></script>
   <script src="js/main.js"></script>
 </head>
 <body class="light-mode">
   <nav class="nav">
     <h2><a href="index.html">Inicio</a> | <a href="html/mqtt.html">Datos en Vivo</a></h2>
+    <!-- Switch de modo claro/oscuro -->
     <label class="theme-switch">
-      <input type="checkbox" class="theme-switch__checkbox">
+      <input type="checkbox" class="theme-switch__checkbox" />
       <div class="theme-switch__container">
         <div class="theme-switch__clouds"></div>
         <div class="theme-switch__stars-container">
