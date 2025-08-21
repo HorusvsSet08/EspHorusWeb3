@@ -1,7 +1,11 @@
+// === Verificación de carga ===
+console.log("🟢 main.js cargado");
+
 // === Configuración MQTT (WSS para GitHub Pages) ===
 const broker = "wss://broker.hivemq.com:8884/mqtt";
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
+// Conexión MQTT
 const client = mqtt.connect(broker, {
   clientId: clientId,
   clean: true,
@@ -135,7 +139,7 @@ function createRain() {
   document.body.appendChild(rain);
 }
 
-// === Inicializar al cargar ===
+// === Inicializar ===
 document.addEventListener("DOMContentLoaded", () => {
   loadTheme();
   if (checkbox) {
