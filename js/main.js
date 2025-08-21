@@ -1,4 +1,4 @@
-// === Configuración MQTT con WSS (para GitHub Pages) ===
+// === Configuración MQTT (WSS para GitHub Pages) ===
 const broker = "wss://broker.hivemq.com:8884/mqtt";
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
@@ -7,11 +7,10 @@ const client = mqtt.connect(broker, {
   clean: true,
   connectTimeout: 10000,
   reconnectPeriod: 3000,
-  protocolVersion: 4,
-  // No necesitas username/password
+  protocolVersion: 4
 });
 
-// === Temas MQTT de tu estación ===
+// === Temas MQTT ===
 const topics = {
   temp: "horus/vvb/temperatura",
   hum: "horus/vvb/humedad",
@@ -68,7 +67,7 @@ client.on("error", (err) => {
   console.error("❌ Error MQTT:", err.message || err);
 });
 
-// === Modo claro/oscuro con localStorage ===
+// === Modo claro/oscuro ===
 const checkbox = document.querySelector(".theme-switch__checkbox");
 const body = document.body;
 
@@ -136,7 +135,7 @@ function createRain() {
   document.body.appendChild(rain);
 }
 
-// === Inicializar ===
+// === Inicializar al cargar ===
 document.addEventListener("DOMContentLoaded", () => {
   loadTheme();
   if (checkbox) {
