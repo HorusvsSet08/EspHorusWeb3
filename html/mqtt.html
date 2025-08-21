@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Datos en Vivo - Horus</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <script src="../js/mqtt.js"></script>
+  <!-- Cargar MQTT primero -->
+  <script src="https://unpkg.com/mqtt@4.6.1/dist/mqtt.js"></script>
+  <script src="../js/main.js"></script>
 </head>
 <body class="light-mode">
   <nav class="nav">
@@ -54,7 +56,5 @@
       <p>Conectado vía MQTT a <code>broker.hivemq.com</code></p>
     </footer>
   </div>
-
-  <script src="../js/main.js"></script>
 </body>
 </html>
