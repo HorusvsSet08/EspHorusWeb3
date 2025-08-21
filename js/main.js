@@ -1,17 +1,11 @@
-// === Verificación inicial (depuración) ===
-console.log("🟢 main.js cargado");
-
-// === Configuración MQTT con WSS (seguro para GitHub Pages) ===
-const broker = "wss://broker.hivemq.com:8884/mqtt"; // ✅ Funciona en HTTPS
-// Alternativa: Usa tu propio broker en HiveMQ Cloud si este falla
-
+// === Configuración MQTT con WSS (para GitHub Pages) ===
+const broker = "wss://broker.hivemq.com:8884/mqtt";
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
-// Conexión MQTT
 const client = mqtt.connect(broker, {
   clientId: clientId,
   clean: true,
-  connectTimeout: 100000,
+  connectTimeout: 10000,
   reconnectPeriod: 3000,
   protocolVersion: 4,
   // No necesitas username/password
@@ -31,25 +25,21 @@ const topics = {
   lluvia: "horus/vvb/lluvia"
 };
 
-// === Mapeo de elementos del DOM (evita errores si no existen) ===
+// === Elementos del DOM ===
 const elements = {};
 Object.keys(topics).forEach(key => {
-  const id = key === 'windSpeed' ? 'wind' : key; // mapea windSpeed → wind
+  const id = key === 'windSpeed' ? 'wind' : key;
   const el = document.getElementById(id);
-  if (el) {
-    elements[key] = el;
-  } else {
-    console.warn(`[main.js] Elemento no encontrado: #${id}`);
-  }
+  if (el) elements[key] = el;
 });
 
-// === Eventos MQTT ===
+// === Conexión MQTT ===
 client.on("connect", () => {
-  console.log("✅ Conectado al broker MQTT:", broker);
+  console.log("✅ Conectado a broker.hivemq.com:8884");
   Object.values(topics).forEach(topic => {
     client.subscribe(topic, (err) => {
       if (err) {
-        console.error("❌ Error al suscribirse a:", topic, err);
+        console.error("❌ Error al suscribirse a:", topic);
       } else {
         console.log("📌 Suscrito a:", topic);
       }
@@ -62,12 +52,9 @@ client.on("message", (topic, payload) => {
   if (!value) return;
 
   const key = Object.keys(topics).find(k => topics[k] === topic);
-  if (!key) return;
-
   const el = elements[key];
   if (!el) return;
 
-  // Formato específico por tipo
   if (key === "temp") el.textContent = `${value} °C`;
   else if (key === "press") el.textContent = `${value} hPa`;
   else if (key === "windSpeed") el.textContent = `${value} km/h`;
@@ -81,19 +68,10 @@ client.on("error", (err) => {
   console.error("❌ Error MQTT:", err.message || err);
 });
 
-client.on("reconnect", () => {
-  console.log("🔁 Reconectando al broker...");
-});
-
-client.on("offline", () => {
-  console.warn("🌐 Cliente desconectado (modo offline)");
-});
-
 // === Modo claro/oscuro con localStorage ===
 const checkbox = document.querySelector(".theme-switch__checkbox");
 const body = document.body;
 
-// Cargar tema guardado
 function loadTheme() {
   const isDark = localStorage.getItem("darkMode") === "true";
   if (isDark) {
@@ -106,7 +84,6 @@ function loadTheme() {
   updateBackgroundEffects();
 }
 
-// Aplicar tema y guardarlo
 function setTheme(isDark) {
   if (isDark) {
     body.classList.replace("light-mode", "dark-mode");
@@ -118,7 +95,7 @@ function setTheme(isDark) {
   updateBackgroundEffects();
 }
 
-// Efectos visuales: partículas o lluvia
+// === Efectos visuales ===
 function updateBackgroundEffects() {
   document.querySelector('.particles')?.remove();
   document.querySelector('.rain')?.remove();
@@ -159,9 +136,12 @@ function createRain() {
   document.body.appendChild(rain);
 }
 
-// === Inicialización al cargar la página ===
+// === Inicializar ===
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("📄 Página cargada, inicializando...");
-  loadTheme(); // Carga tema y aplica efectos
+  loadTheme();
+  if (checkbox) {
+    checkbox.addEventListener("change", (e) => {
+      setTheme(e.target.checked);
+    });
+  }
 });
-
