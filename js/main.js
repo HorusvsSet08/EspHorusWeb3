@@ -2,7 +2,7 @@
 console.log("🟢 main.js cargado");
 
 // === Configuración MQTT con WSS (seguro para GitHub Pages) ===
-const broker = "wss://test.mosquitto.org:8081/mqtt"; // ✅ Funciona en HTTPS
+const broker = "wss://broker.hivemq.com:8884/mqtt"; // ✅ Funciona en HTTPS
 // Alternativa: Usa tu propio broker en HiveMQ Cloud si este falla
 
 const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
@@ -11,10 +11,10 @@ const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 const client = mqtt.connect(broker, {
   clientId: clientId,
   clean: true,
-  connectTimeout: 10000,
+  connectTimeout: 100000,
   reconnectPeriod: 3000,
-  protocolVersion: 4, // MQTT 3.1.1
-  rejectUnauthorized: false // Necesario para algunos brokers públicos
+  protocolVersion: 4,
+  // No necesitas username/password
 });
 
 // === Temas MQTT de tu estación ===
@@ -164,3 +164,4 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("📄 Página cargada, inicializando...");
   loadTheme(); // Carga tema y aplica efectos
 });
+
