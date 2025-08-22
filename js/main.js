@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🟢 main.js: Página cargada e inicializando...");
 
-  // === Modo claro/oscuro (funciona en ambas páginas) ===
+  // === Elementos del DOM ===
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // === Modo claro/oscuro ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -33,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
+  // === Efectos visuales ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -73,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
+  // === Cargar tema y escuchar cambios ===
   loadTheme();
 
   if (checkbox) {
@@ -85,17 +88,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("mqtt.html")) {
     console.log("📡 Iniciando conexión MQTT en mqtt.html");
 
-    // ✅ Verifica que mqtt.js se haya cargado
     if (typeof mqtt === 'undefined') {
-      console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica:");
-      console.error("   1. Que el archivo mqtt.js esté en js/mqtt.js");
-      console.error("   2. Que se cargue ANTES que main.js");
-      console.error("   3. Que el nombre sea mqtt.js (no .txt)");
-      console.error("   4. Que GitHub lo sirva (no 404)");
+      console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica la ruta.");
       return;
     }
 
-    // === Conexión MQTT (WSS para GitHub Pages) ===
     const broker = "wss://broker.hivemq.com:8884/mqtt";
     const client = mqtt.connect(broker, {
       clientId: "webClient_" + Math.random().toString(16).substr(2, 8),
@@ -105,14 +102,50 @@ document.addEventListener("DOMContentLoaded", () => {
       reconnectPeriod: 3000
     });
 
+    const topics = {
+      temp: "horus/vvb/temperatura",
+      hum: "horus/vvb/humedad",
+      press: "horus/vvb/presion",
+      alt: "horus/vvb/altitud",
+      pm25: "horus/vvb/pm25",
+      pm10: "horus/vvb/pm10",
+      windSpeed: "horus/vvb/wind_speed",
+      windDir: "horus/vvb/wind_direction",
+      gas: "horus/vvb/gas",
+      lluvia: "horus/vvb/lluvia"
+    };
+
+    const elements = {};
+    Object.keys(topics).forEach(key => {
+      const id = key === 'windSpeed' ? 'wind' : key;
+      const el = document.getElementById(id);
+      if (el) elements[key] = el;
+    });
+
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
-      // Suscribe a tus temas aquí
+      Object.values(topics).forEach(topic => {
+        client.subscribe(topic, (err) => {
+          if (!err) console.log("📌 Suscrito a:", topic);
+        });
+      });
     });
 
     client.on("message", (topic, payload) => {
-      console.log("📩", topic, payload.toString());
-      // Actualiza los datos aquí
+      const value = payload.toString().trim();
+      if (!value) return;
+
+      const key = Object.keys(topics).find(k => topics[k] === topic);
+      const el = elements[key];
+      if (!el) return;
+
+      if (key === "temp") el.textContent = `${value} °C`;
+      else if (key === "press") el.textContent = `${value} hPa`;
+      else if (key === "windSpeed") el.textContent = `${value} km/h`;
+      else if (key === "windDir") el.textContent = `${value} °`;
+      else if (key === "gas") el.textContent = `${value} kΩ`;
+      else if (key === "lluvia") el.textContent = `${value} mm`;
+      else el.textContent = value;
     });
 
     client.on("error", (err) => {
