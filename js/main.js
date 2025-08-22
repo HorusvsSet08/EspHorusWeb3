@@ -4,12 +4,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
-  if (!body) {
-    console.error("❌ ERROR FATAL: No se encontró <body>");
-    return;
+  // === Elementos de UI ===
+  const connectionStatus = document.createElement('div');
+  connectionStatus.className = 'connection-status';
+  connectionStatus.innerHTML = '<span class="dot"></span> Estado: Desconectado';
+  document.querySelector('header').after(connectionStatus);
+
+  const lastUpdate = document.createElement('div');
+  lastUpdate.className = 'last-update';
+  lastUpdate.textContent = 'Última actualización: nunca';
+  connectionStatus.after(lastUpdate);
+
+  let lastDataTime = null;
+
+  function updateLastUpdate() {
+    if (!lastDataTime) {
+      lastUpdate.textContent = 'Última actualización: nunca';
+      return;
+    }
+    const diff = Math.floor((Date.now() - lastDataTime) / 1000);
+    lastUpdate.textContent = `Última actualización: hace ${diff}s`;
   }
 
-  // === Cargar tema guardado ===
+  setInterval(updateLastUpdate, 1000);
+
+  // === Modo claro/oscuro (como antes) ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -22,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
-  // === Guardar y aplicar tema ===
   function setTheme(isDark) {
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
@@ -34,7 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
-  // === Efectos visuales mejorados ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -57,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
       dot.style.opacity = Math.random() * 0.5 + 0.3;
       dot.style.animationDuration = (Math.random() * 10 + 5) + 's';
       dot.style.animationDelay = (Math.random() * 5) + 's';
-      dot.style.setProperty('--duration', Math.random());
       dot.style.setProperty('--delay', Math.random());
       particles.appendChild(dot);
     }
@@ -80,19 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === Cargar tema y escuchar cambios ===
+  // === Cargar tema ===
   loadTheme();
-
   if (checkbox) {
-    checkbox.addEventListener("change", (e) => {
-      setTheme(e.target.checked);
-    });
+    checkbox.addEventListener("change", (e) => setTheme(e.target.checked));
   }
 
-  // === Solo en mqtt.html: iniciar MQTT ===
+  // === Conexión MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
-    console.log("📡 Iniciando conexión MQTT en mqtt.html");
-
     if (typeof mqtt === 'undefined') {
       console.error("❌ ERROR: mqtt.js no se ha cargado.");
       return;
@@ -127,17 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) elements[key] = el;
     });
 
+    // === Estado de conexión ===
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
-      Object.values(topics).forEach(topic => {
-        client.subscribe(topic, (err) => {
-          if (err) {
-            console.error("❌ Error al suscribirse a:", topic);
-          } else {
-            console.log("📌 Suscrito a:", topic);
-          }
-        });
-      });
+      connectionStatus.className = 'connection-status connected';
+      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Conectado';
+      Object.values(topics).forEach(topic => client.subscribe(topic));
     });
 
     client.on("message", (topic, payload) => {
@@ -155,10 +161,19 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "gas") el.textContent = `${value} kΩ`;
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
+
+      lastDataTime = Date.now(); // Marca el tiempo del último dato
     });
 
     client.on("error", (err) => {
       console.error("❌ Error MQTT:", err.message || err);
+      connectionStatus.className = 'connection-status';
+      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Error';
+    });
+
+    client.on("close", () => {
+      connectionStatus.className = 'connection-status';
+      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Desconectado';
     });
   }
 });
