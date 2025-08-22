@@ -461,3 +461,77 @@ body.light-mode .nav-btn {
 body.light-mode .nav-btn:hover {
   background: rgba(52, 152, 219, 0.1);
 }
+
+/* === Nav con iconos === */
+.nav {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-left {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: rgba(52, 152, 219, 0.2);
+}
+
+.nav-btn:hover {
+  background: rgba(52, 152, 219, 0.4);
+  transform: translateY(-1px);
+}
+
+.nav-btn.active {
+  background: rgba(52, 152, 219, 0.6);
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+  color: white;
+}
+
+.nav-icon {
+  font-size: 1.2em;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Dark mode */
+body.light-mode .nav {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid #ddd;
+}
+
+body.light-mode .nav-btn {
+  color: #2c3e50;
+}
+
+body.light-mode .nav-btn:hover {
+  background: rgba(52, 152, 219, 0.1);
+}
+
+body.light-mode .nav-btn.active {
+  background: #3498db;
+  color: white;
+}
