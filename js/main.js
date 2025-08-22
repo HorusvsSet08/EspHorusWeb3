@@ -1,42 +1,17 @@
-// === Solo declaramos, no asignamos aún ===
-let body, checkbox;
-
-// === Temas MQTT ===
-const topics = {
-  temp: "horus/vvb/temperatura",
-  hum: "horus/vvb/humedad",
-  press: "horus/vvb/presion",
-  alt: "horus/vvb/altitud",
-  pm25: "horus/vvb/pm25",
-  pm10: "horus/vvb/pm10",
-  windSpeed: "horus/vvb/wind_speed",
-  windDir: "horus/vvb/wind_direction",
-  gas: "horus/vvb/gas",
-  lluvia: "horus/vvb/lluvia"
-};
-
-// === Elementos del DOM (evita null) ===
-const elements = {};
-Object.keys(topics).forEach(key => {
-  const id = key === 'windSpeed' ? 'wind' : key;
-  const el = document.getElementById(id);
-  if (el) elements[key] = el;
-});
-
-// === Inicializar cuando el DOM esté listo ===
+// === Solo se ejecuta cuando el DOM esté listo ===
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("📄 Página cargada, inicializando...");
+  console.log("🟢 main.js: Página cargada, inicializando...");
 
-  // ✅ Aseguramos que el body y el checkbox existan
-  body = document.body;
-  checkbox = document.querySelector(".theme-switch__checkbox");
+  // === Variables del DOM ===
+  const body = document.body;
+  const checkbox = document.querySelector(".theme-switch__checkbox");
 
   if (!body) {
-    console.error("❌ <body> no encontrado");
+    console.error("❌ Error: No se encontró el elemento <body>");
     return;
   }
 
-  // === Conexión MQTT ===
+  // === Configuración MQTT (WSS para GitHub Pages) ===
   const broker = "wss://broker.hivemq.com:8884/mqtt";
   const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
@@ -48,6 +23,33 @@ document.addEventListener("DOMContentLoaded", () => {
     protocolVersion: 4
   });
 
+  // === Temas MQTT de tu estación ===
+  const topics = {
+    temp: "horus/vvb/temperatura",
+    hum: "horus/vvb/humedad",
+    press: "horus/vvb/presion",
+    alt: "horus/vvb/altitud",
+    pm25: "horus/vvb/pm25",
+    pm10: "horus/vvb/pm10",
+    windSpeed: "horus/vvb/wind_speed",
+    windDir: "horus/vvb/wind_direction",
+    gas: "horus/vvb/gas",
+    lluvia: "horus/vvb/lluvia"
+  };
+
+  // === Mapeo de elementos del DOM ===
+  const elements = {};
+  Object.keys(topics).forEach(key => {
+    const id = key === 'windSpeed' ? 'wind' : key;
+    const el = document.getElementById(id);
+    if (el) {
+      elements[key] = el;
+    } else {
+      console.warn(`[main.js] Elemento no encontrado: #${id}`);
+    }
+  });
+
+  // === Conexión MQTT ===
   client.on("connect", () => {
     console.log("✅ Conectado a broker.hivemq.com:8884");
     Object.values(topics).forEach(topic => {
@@ -61,14 +63,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // === Recibir mensajes ===
   client.on("message", (topic, payload) => {
     const value = payload.toString().trim();
-    if (!value) return;
+    if (!value) {
+      console.log("📩 Mensaje vacío recibido:", topic);
+      return;
+    }
+    console.log("📩 Recibido en", topic, "→", value);
 
     const key = Object.keys(topics).find(k => topics[k] === topic);
     const el = elements[key];
     if (!el) return;
 
+    // Formato por tipo
     if (key === "temp") el.textContent = `${value} °C`;
     else if (key === "press") el.textContent = `${value} hPa`;
     else if (key === "windSpeed") el.textContent = `${value} km/h`;
@@ -82,7 +90,11 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("❌ Error MQTT:", err.message || err);
   });
 
-  // === Modo claro/oscuro (ahora seguro) ===
+  client.on("offline", () => {
+    console.warn("🌐 Cliente desconectado (modo offline)");
+  });
+
+  // === Modo claro/oscuro ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -147,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // ✅ Cargar tema y escuchar cambios
+  // === Inicializar tema y eventos ===
   loadTheme();
 
   if (checkbox) {
