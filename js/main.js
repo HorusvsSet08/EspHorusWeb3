@@ -9,32 +9,26 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // === Elementos de UI (conexión y tiempo) ===
-  const connectionStatus = document.createElement('div');
-  connectionStatus.className = 'connection-status';
-  connectionStatus.innerHTML = '<span class="dot"></span> Estado: Desconectado';
-  const header = document.querySelector('header');
-  if (header) header.after(connectionStatus);
-
-  const lastUpdate = document.createElement('div');
-  lastUpdate.className = 'last-update';
-  lastUpdate.textContent = 'Última actualización: nunca';
-  connectionStatus.after(lastUpdate);
+  // === Elementos de UI: estado de conexión y tiempo ===
+  const connectionStatus = document.querySelector('.connection-status-small');
+  const statusText = connectionStatus?.querySelector('.status-text');
+  const lastUpdate = connectionStatus?.querySelector('.last-update');
 
   let lastDataTime = null;
 
   function updateLastUpdate() {
-    if (!lastDataTime) {
-      lastUpdate.textContent = 'Última actualización: nunca';
+    if (!lastDataTime || !lastUpdate) {
+      if (lastUpdate) lastUpdate.textContent = 'última: nunca';
       return;
     }
     const diff = Math.floor((Date.now() - lastDataTime) / 1000);
-    lastUpdate.textContent = `Última actualización: hace ${diff}s`;
+    lastUpdate.textContent = `última: hace ${diff}s`;
   }
 
+  // Actualizar cada segundo
   setInterval(updateLastUpdate, 1000);
 
-  // === Modo claro/oscuro ===
+  // === Cargar tema guardado ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -47,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
+  // === Guardar y aplicar tema ===
   function setTheme(isDark) {
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
@@ -58,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
-  // === Efectos visuales mejorados ===
+  // === Efectos visuales (partículas o lluvia) ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -103,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === Cargar tema al iniciar ===
+  // === Cargar tema y escuchar cambios ===
   loadTheme();
 
   if (checkbox) {
@@ -112,12 +107,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Solo en mqtt.html: conectar a MQTT ===
+  // === Solo en mqtt.html: iniciar conexión MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
     console.log("📡 Iniciando conexión MQTT en mqtt.html");
 
     if (typeof mqtt === 'undefined') {
       console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica la ruta.");
+      if (connectionStatus && statusText) {
+        statusText.textContent = "Error";
+        connectionStatus.classList.remove('connected');
+      }
       return;
     }
 
@@ -150,11 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) elements[key] = el;
     });
 
+    // === Conexión exitosa ===
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
-      connectionStatus.className = 'connection-status connected';
-      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Conectado';
+      if (connectionStatus && statusText) {
+        statusText.textContent = "Conectado";
+        connectionStatus.classList.add('connected');
+      }
 
+      // Suscribirse a todos los temas
       Object.values(topics).forEach(topic => {
         client.subscribe(topic, (err) => {
           if (err) {
@@ -166,6 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    // === Mensaje recibido ===
     client.on("message", (topic, payload) => {
       const value = payload.toString().trim();
       if (!value) return;
@@ -183,18 +187,26 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
 
-      lastDataTime = Date.now(); // Marcar tiempo del último dato
+      // Marcar tiempo del último dato recibido
+      lastDataTime = Date.now();
     });
 
+    // === Error de conexión ===
     client.on("error", (err) => {
       console.error("❌ Error MQTT:", err.message || err);
-      connectionStatus.className = 'connection-status';
-      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Error';
+      if (connectionStatus && statusText) {
+        statusText.textContent = "Error";
+        connectionStatus.classList.remove('connected');
+      }
     });
 
+    // === Desconexión ===
     client.on("close", () => {
-      connectionStatus.className = 'connection-status';
-      connectionStatus.innerHTML = '<span class="dot"></span> Estado: Desconectado';
+      console.log("🔌 Conexión cerrada");
+      if (connectionStatus && statusText) {
+        statusText.textContent = "Desconectado";
+        connectionStatus.classList.remove('connected');
+      }
     });
   }
 });
