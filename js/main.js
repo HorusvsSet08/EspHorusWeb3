@@ -1,9 +1,7 @@
-// === main.js: Estación Meteorológica Horus ===
-// Versión con logs para depuración y correcciones de errores
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🟢 main.js: Página cargada e inicializando...");
 
-  // === 1. Elementos del DOM (modo oscuro) ===
+  // === Elementos del DOM ===
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
@@ -12,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // === 2. Modo claro/oscuro (funciona en ambas páginas) ===
+  // === Modo claro/oscuro ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     console.log("🔄 Cargando tema:", isDark ? "oscuro" : "claro");
@@ -20,11 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
       if (checkbox) checkbox.checked = true;
-      console.log("🌙 Modo oscuro aplicado");
     } else {
       body.classList.replace("dark-mode", "light-mode");
       if (checkbox) checkbox.checked = false;
-      console.log("☀️ Modo claro aplicado");
     }
     updateBackgroundEffects();
   }
@@ -33,26 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
       localStorage.setItem("darkMode", "true");
-      console.log("🌙 Modo oscuro activado");
     } else {
       body.classList.replace("dark-mode", "light-mode");
       localStorage.setItem("darkMode", "false");
-      console.log("☀️ Modo claro activado");
     }
     updateBackgroundEffects();
   }
 
-  // === 3. Efectos visuales (partículas o lluvia) ===
+  // === Efectos visuales (partículas o lluvia) ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
 
     if (body.classList.contains('light-mode')) {
       createParticles();
-      console.log("✨ Partículas creadas");
     } else {
       createRain();
-      console.log("🌧️ Lluvia creada");
     }
   }
 
@@ -85,33 +77,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === 4. Cargar tema y escuchar cambios ===
+  // === Cargar tema y escuchar cambios ===
   loadTheme();
 
   if (checkbox) {
     checkbox.addEventListener("change", (e) => {
       setTheme(e.target.checked);
     });
-  } else {
-    console.warn("⚠️ Switch de modo oscuro no encontrado (opcional)");
   }
 
-  // === 5. Solo en mqtt.html: iniciar MQTT ===
+  // === Solo en mqtt.html: iniciar MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
     console.log("📡 Iniciando conexión MQTT en mqtt.html");
 
-    // ✅ Verifica que mqtt.js se haya cargado
     if (typeof mqtt === 'undefined') {
-      console.error("❌ ERROR: mqtt.js no se ha cargado.");
-      console.error("   → Verifica:");
-      console.error("     1. Que el archivo mqtt.js esté en js/mqtt.js");
-      console.error("     2. Que se cargue ANTES que main.js");
-      console.error("     3. Que el nombre sea mqtt.js (no .txt)");
-      console.error("     4. Que GitHub lo sirva (no 404)");
+      console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica la ruta.");
       return;
     }
 
-    // === Configuración del broker ===
     const broker = "wss://broker.hivemq.com:8884/mqtt";
     const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
 
@@ -123,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
       protocolVersion: 4
     });
 
-    // === Temas MQTT ===
     const topics = {
       temp: "horus/vvb/temperatura",
       hum: "horus/vvb/humedad",
@@ -137,28 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
       lluvia: "horus/vvb/lluvia"
     };
 
-    // === Mapeo de elementos del DOM ===
     const elements = {};
     Object.keys(topics).forEach(key => {
       const id = key === 'windSpeed' ? 'wind' : key;
       const el = document.getElementById(id);
-      if (el) {
-        elements[key] = el;
-        console.log(`✅ Elemento encontrado: #${id}`);
-      } else {
-        console.warn(`⚠️ Elemento no encontrado: #${id}`);
-      }
+      if (el) elements[key] = el;
     });
 
-    // === Eventos MQTT ===
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
-      console.log("🔍 Intentando suscribirse a los temas...");
-
       Object.values(topics).forEach(topic => {
         client.subscribe(topic, (err) => {
           if (err) {
-            console.error("❌ Error al suscribirse a:", topic, err.message || err);
+            console.error("❌ Error al suscribirse a:", topic);
           } else {
             console.log("📌 Suscrito a:", topic);
           }
@@ -168,20 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     client.on("message", (topic, payload) => {
       const value = payload.toString().trim();
-      if (!value) {
-        console.log("📩 Mensaje vacío recibido:", topic);
-        return;
-      }
-      console.log("📩 MENSAJE RECIBIDO:", topic, "→", value);
+      if (!value) return;
 
       const key = Object.keys(topics).find(k => topics[k] === topic);
       const el = elements[key];
-      if (!el) {
-        console.warn("⚠️ No hay elemento para mostrar:", topic);
-        return;
-      }
+      if (!el) return;
 
-      // Formato por tipo
       if (key === "temp") el.textContent = `${value} °C`;
       else if (key === "press") el.textContent = `${value} hPa`;
       else if (key === "windSpeed") el.textContent = `${value} km/h`;
@@ -194,14 +159,5 @@ document.addEventListener("DOMContentLoaded", () => {
     client.on("error", (err) => {
       console.error("❌ Error MQTT:", err.message || err);
     });
-
-    client.on("offline", () => {
-      console.warn("🌐 Cliente desconectado (modo offline)");
-    });
-
-    client.on("reconnect", () => {
-      console.log("🔁 Reconectando...");
-    });
   }
-  // Fin del bloque MQTT (solo en mqtt.html)
 });
