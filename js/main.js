@@ -144,3 +144,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// === Crear nubes en modo claro ===
+function createClouds() {
+  document.querySelectorAll('.cloud').forEach(el => el.remove());
+
+  for (let i = 0; i < 5; i++) {
+    const cloud = document.createElement('div');
+    cloud.classList.add('cloud');
+    cloud.style.animationDelay = (Math.random() * 40) + 's';
+    cloud.style.top = (Math.random() * 30 + 10) + 'vh';
+    cloud.style.opacity = 0.7 + Math.random() * 0.3;
+    document.body.appendChild(cloud);
+  }
+}
+
+// === Actualizar efectos visuales ===
+function updateBackgroundEffects() {
+  document.querySelector('.particles')?.remove();
+  document.querySelector('.rain')?.remove();
+  document.querySelectorAll('.cloud').forEach(el => el.remove());
+
+  if (body.classList.contains('light-mode')) {
+    createParticles();
+    createClouds();
+  } else {
+    createRain();
+  }
+}
