@@ -1,20 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("🟢 main.js: Página cargada e inicializando...");
 
-  // === Elementos del DOM ===
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
   if (!body) {
-    console.error("❌ ERROR FATAL: No se encontró el elemento <body>");
+    console.error("❌ ERROR FATAL: No se encontró <body>");
     return;
   }
 
-  // === Modo claro/oscuro ===
+  // === Cargar tema guardado ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
-    console.log("🔄 Cargando tema:", isDark ? "oscuro" : "claro");
-
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
       if (checkbox) checkbox.checked = true;
@@ -25,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
+  // === Guardar y aplicar tema ===
   function setTheme(isDark) {
     if (isDark) {
       body.classList.replace("light-mode", "dark-mode");
@@ -91,19 +89,17 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("📡 Iniciando conexión MQTT en mqtt.html");
 
     if (typeof mqtt === 'undefined') {
-      console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica la ruta.");
+      console.error("❌ ERROR: mqtt.js no se ha cargado.");
       return;
     }
 
     const broker = "wss://broker.hivemq.com:8884/mqtt";
-    const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
-
     const client = mqtt.connect(broker, {
-      clientId: clientId,
+      clientId: "webClient_" + Math.random().toString(16).substr(2, 8),
+      protocolVersion: 4,
       clean: true,
       connectTimeout: 10000,
-      reconnectPeriod: 3000,
-      protocolVersion: 4
+      reconnectPeriod: 3000
     });
 
     const topics = {
