@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
-  // === Efectos visuales ===
+  // === Efectos visuales mejorados ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -49,13 +49,16 @@ document.addEventListener("DOMContentLoaded", () => {
   function createParticles() {
     const particles = document.createElement('div');
     particles.classList.add('particles');
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 50; i++) {
       const dot = document.createElement('div');
       dot.classList.add('particle');
       dot.style.left = Math.random() * 100 + 'vw';
       dot.style.top = Math.random() * 100 + 'vh';
       dot.style.opacity = Math.random() * 0.5 + 0.3;
       dot.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      dot.style.animationDelay = (Math.random() * 5) + 's';
+      dot.style.setProperty('--duration', Math.random());
+      dot.style.setProperty('--delay', Math.random());
       particles.appendChild(dot);
     }
     document.body.appendChild(particles);
@@ -64,12 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function createRain() {
     const rain = document.createElement('div');
     rain.classList.add('rain');
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
       const drop = document.createElement('div');
       drop.classList.add('raindrop');
       drop.style.left = Math.random() * 100 + 'vw';
       drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
       drop.style.opacity = Math.random() * 0.6 + 0.4;
+      drop.style.animationDelay = (Math.random() * 3) + 's';
+      drop.style.setProperty('--delay', Math.random());
       rain.appendChild(drop);
     }
     document.body.appendChild(rain);
