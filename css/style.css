@@ -1111,3 +1111,83 @@ body.dark-mode::before {
   background: rgba(10, 15, 25, 0.85);
   backdrop-filter: blur(10px);
 }
+
+/* === Relámpagos en modo oscuro (tormenta) === */
+body.dark-mode::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.7), transparent 70%);
+  animation: lightning 8s infinite random-delay;
+}
+
+@keyframes lightning {
+  0%, 98%, 100% { opacity: 0; }
+  97% { opacity: 0.8; }
+}
+
+/* Animación aleatoria de rayos */
+@keyframes random-delay {
+  0% { animation-delay: 0s; }
+  25% { animation-delay: 2s; }
+  50% { animation-delay: 5s; }
+  75% { animation-delay: 8s; }
+  100% { animation-delay: 10s; }
+}
+
+/* === Nubes pasando en modo claro (día) === */
+.cloud {
+  position: fixed;
+  top: 10%;
+  left: -100px;
+  width: 300px;
+  height: 100px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.8;
+  animation: moveCloud 60s linear infinite;
+  animation-delay: calc(var(--delay) * 10s);
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud::before {
+  width: 80px;
+  height: 80px;
+  top: 40px;
+  left: 50px;
+}
+
+.cloud::after {
+  width: 120px;
+  height: 120px;
+  top: 20px;
+  left: 80px;
+}
+
+@keyframes moveCloud {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(110vw); }
+}/* === Fondo modo claro: cielo con nubes === */
+body.light-mode {
+  background: linear-gradient(180deg, #a8d8f0 0%, #7bb8e0 30%, #5dade2 70%, #357abd 100%);
+  background-attachment: fixed;
+}
+
+/* === Fondo modo oscuro: tormenta con rayos === */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
+  background-attachment: fixed;
+}
