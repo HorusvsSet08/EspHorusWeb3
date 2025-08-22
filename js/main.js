@@ -55,39 +55,38 @@ document.addEventListener("DOMContentLoaded", () => {
     body.classList.toggle("dark-mode", isDarkMode);
     body.classList.toggle("light-mode", !isDarkMode);
     localStorage.setItem("darkMode", isDarkMode);
-
-    // Actualizar efectos
     updateVisualEffects(isDarkMode);
   }
 
-  // === Efectos visuales (nubes, partículas, lluvia, rayos) ===
+  // === Efectos visuales ===
   function updateVisualEffects(isDarkMode) {
-    // Limpiar efectos anteriores
     document.querySelectorAll('.particles, .rain, .cloud').forEach(el => el.remove());
-    document.body.style.setProperty('--lightning-delay', Math.random() * 10 + 's');
 
     if (isDarkMode) {
       createRain();
-      // Activar rayos (el CSS ya los controla con animation-delay aleatorio)
+      createRandomLightning();
     } else {
       createParticles();
       createClouds();
     }
   }
 
-  // === Nubes en modo claro ===
+  // === Nubes mejoradas (modo claro) ===
   function createClouds() {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       const cloud = document.createElement('div');
       cloud.classList.add('cloud');
       cloud.style.setProperty('--delay', Math.random());
       cloud.style.top = (Math.random() * 30 + 10) + 'vh';
-      cloud.style.opacity = 0.6 + Math.random() * 0.4;
+      cloud.style.opacity = 0.7 + Math.random() * 0.3;
+
+      const core = document.createElement('span');
+      cloud.appendChild(core);
       document.body.appendChild(cloud);
     }
   }
 
-  // === Partículas en modo claro ===
+  // === Partículas (modo claro) ===
   function createParticles() {
     const particles = document.createElement('div');
     particles.classList.add('particles');
@@ -104,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(particles);
   }
 
-  // === Lluvia en modo oscuro ===
+  // === Lluvia (modo oscuro) ===
   function createRain() {
     const rain = document.createElement('div');
     rain.classList.add('rain');
@@ -121,6 +120,26 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
+  // === Rayos aleatorios (modo oscuro) ===
+  function createRandomLightning() {
+    setInterval(() => {
+      if (!body.classList.contains('dark-mode')) return;
+
+      const flash = document.createElement('div');
+      flash.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: -1; opacity: 0;
+        background: radial-gradient(ellipse at center, rgba(255,255,255,0.9), transparent 70%);
+        animation: 0.3s lightning-flash ease-out forwards;
+      `;
+      flash.style.setProperty('--x', Math.random() * 100 + 'vw');
+      flash.style.setProperty('--y', Math.random() * 60 + 'vh');
+
+      document.body.appendChild(flash);
+      setTimeout(() => flash.remove(), 300);
+    }, Math.random() * 6000 + 4000); // Cada 4-10 segundos
+  }
+
   // === Escuchar cambios en el switch ===
   if (checkbox) {
     checkbox.addEventListener("change", (e) => {
@@ -128,8 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Inicializar efectos al cargar ===
-  setTheme(isDark); // Esto llama a updateVisualEffects
+  // === Inicializar efectos ===
+  updateVisualEffects(isDark);
 
   // === Solo en mqtt.html: conectar a MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
@@ -198,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
 
-      lastDataTime = Date.now(); // Marcar tiempo del último dato
+      lastDataTime = Date.now();
     });
 
     client.on("error", (err) => {
