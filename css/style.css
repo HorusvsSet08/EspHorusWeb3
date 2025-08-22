@@ -421,3 +421,122 @@ body.light-mode .data-card strong {
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
+/* === Switch de modo oscuro (corregido) === */
+.theme-switch {
+  display: inline-block;
+  position: relative;
+  width: 60px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.theme-switch__checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.theme-switch__container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ccc;
+  border-radius: 30px;
+  transition: 0.4s;
+  overflow: hidden;
+}
+
+.theme-switch__container:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+/* Modo oscuro activado */
+body.dark-mode .theme-switch__container {
+  background: #3498db;
+}
+
+body.dark-mode .theme-switch__container:before {
+  transform: translateX(30px);
+}
+
+/* Efectos internos del switch (nubes y estrellas) */
+.theme-switch__clouds,
+.theme-switch__stars-container,
+.theme-switch__circle-container {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.dark-mode .theme-switch__clouds {
+  opacity: 1;
+}
+
+body.light-mode .theme-switch__stars-container,
+body.light-mode .theme-switch__circle-container {
+  opacity: 1;
+}
+
+/* === Colores de texto mejorados === */
+body.light-mode {
+  background: #f0f2f5;
+  color: #2c3e50;
+}
+
+body.dark-mode {
+  background: #121212;
+  color: #e6edf3;
+}
+
+/* Asegura que los textos se vean bien */
+.container,
+header,
+main,
+footer,
+.data-card,
+nav {
+  color: inherit;
+}
+
+/* Enfoca el contraste en las tarjetas */
+.data-card strong {
+  color: #3498db;
+}
+
+body.dark-mode .data-card strong {
+  color: #5dade2;
+}
+
+/* Evita gris sobre gris */
+body.dark-mode section,
+body.dark-mode .data-card {
+  background: rgba(30, 30, 40, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Footer */
+footer {
+  color: #7f8c8d;
+}
+
+body.dark-mode footer {
+  color: #bdc3c7;
+}
+
+.theme-switch__checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
