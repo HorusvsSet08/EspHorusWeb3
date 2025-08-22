@@ -408,4 +408,56 @@ body.dark-mode .nav {
 body.dark-mode footer {
   color: #8b949e;
   border-top-color: #30363d;
+
+}
+
+/* === Nuevo estilo del nav === */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(52, 152, 219, 0.2);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background: rgba(52, 152, 219, 0.4);
+  transform: translateY(-1px);
+}
+
+.nav-btn.active {
+  background: rgba(52, 152, 219, 0.6);
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+/* Dark mode support */
+body.light-mode .nav {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid #ddd;
+}
+
+body.light-mode .nav-btn {
+  color: #2c3e50;
+}
+
+body.light-mode .nav-btn:hover {
+  background: rgba(52, 152, 219, 0.1);
 }
