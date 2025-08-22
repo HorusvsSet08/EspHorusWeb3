@@ -4,11 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
-  // === Elementos de UI ===
+  if (!body) {
+    console.error("❌ ERROR FATAL: No se encontró el elemento <body>");
+    return;
+  }
+
+  // === Elementos de UI (conexión y tiempo) ===
   const connectionStatus = document.createElement('div');
   connectionStatus.className = 'connection-status';
   connectionStatus.innerHTML = '<span class="dot"></span> Estado: Desconectado';
-  document.querySelector('header').after(connectionStatus);
+  const header = document.querySelector('header');
+  if (header) header.after(connectionStatus);
 
   const lastUpdate = document.createElement('div');
   lastUpdate.className = 'last-update';
@@ -28,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(updateLastUpdate, 1000);
 
-  // === Modo claro/oscuro (como antes) ===
+  // === Modo claro/oscuro ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -52,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
+  // === Efectos visuales mejorados ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -66,13 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function createParticles() {
     const particles = document.createElement('div');
     particles.classList.add('particles');
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 70; i++) {
       const dot = document.createElement('div');
       dot.classList.add('particle');
       dot.style.left = Math.random() * 100 + 'vw';
       dot.style.top = Math.random() * 100 + 'vh';
-      dot.style.opacity = Math.random() * 0.5 + 0.3;
-      dot.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      dot.style.opacity = Math.random() * 0.6 + 0.4;
+      dot.style.animationDuration = (Math.random() * 6 + 4) + 's';
       dot.style.animationDelay = (Math.random() * 5) + 's';
       dot.style.setProperty('--delay', Math.random());
       particles.appendChild(dot);
@@ -96,16 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === Cargar tema ===
+  // === Cargar tema al iniciar ===
   loadTheme();
+
   if (checkbox) {
-    checkbox.addEventListener("change", (e) => setTheme(e.target.checked));
+    checkbox.addEventListener("change", (e) => {
+      setTheme(e.target.checked);
+    });
   }
 
-  // === Conexión MQTT ===
+  // === Solo en mqtt.html: conectar a MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
+    console.log("📡 Iniciando conexión MQTT en mqtt.html");
+
     if (typeof mqtt === 'undefined') {
-      console.error("❌ ERROR: mqtt.js no se ha cargado.");
+      console.error("❌ ERROR: mqtt.js no se ha cargado. Verifica la ruta.");
       return;
     }
 
@@ -138,12 +150,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (el) elements[key] = el;
     });
 
-    // === Estado de conexión ===
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
       connectionStatus.className = 'connection-status connected';
       connectionStatus.innerHTML = '<span class="dot"></span> Estado: Conectado';
-      Object.values(topics).forEach(topic => client.subscribe(topic));
+
+      Object.values(topics).forEach(topic => {
+        client.subscribe(topic, (err) => {
+          if (err) {
+            console.error("❌ Error al suscribirse a:", topic);
+          } else {
+            console.log("📌 Suscrito a:", topic);
+          }
+        });
+      });
     });
 
     client.on("message", (topic, payload) => {
@@ -154,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const el = elements[key];
       if (!el) return;
 
+      // Formatear valores
       if (key === "temp") el.textContent = `${value} °C`;
       else if (key === "press") el.textContent = `${value} hPa`;
       else if (key === "windSpeed") el.textContent = `${value} km/h`;
@@ -162,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
 
-      lastDataTime = Date.now(); // Marca el tiempo del último dato
+      lastDataTime = Date.now(); // Marcar tiempo del último dato
     });
 
     client.on("error", (err) => {
