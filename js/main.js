@@ -1,100 +1,15 @@
-// === Solo se ejecuta cuando el DOM esté listo ===
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🟢 main.js: Página cargada, inicializando...");
+  console.log("🟢 main.js: Página cargada");
 
-  // === Variables del DOM ===
+  // === 1. Modo claro/oscuro (funciona en AMBAS páginas) ===
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
   if (!body) {
-    console.error("❌ Error: No se encontró el elemento <body>");
+    console.error("❌ <body> no encontrado");
     return;
   }
 
-  // === Configuración MQTT (WSS para GitHub Pages) ===
-  const broker = "wss://broker.hivemq.com:8884/mqtt";
-  const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
-
-  const client = mqtt.connect(broker, {
-    clientId: clientId,
-    clean: true,
-    connectTimeout: 10000,
-    reconnectPeriod: 3000,
-    protocolVersion: 4
-  });
-
-  // === Temas MQTT de tu estación ===
-  const topics = {
-    temp: "horus/vvb/temperatura",
-    hum: "horus/vvb/humedad",
-    press: "horus/vvb/presion",
-    alt: "horus/vvb/altitud",
-    pm25: "horus/vvb/pm25",
-    pm10: "horus/vvb/pm10",
-    windSpeed: "horus/vvb/wind_speed",
-    windDir: "horus/vvb/wind_direction",
-    gas: "horus/vvb/gas",
-    lluvia: "horus/vvb/lluvia"
-  };
-
-  // === Mapeo de elementos del DOM ===
-  const elements = {};
-  Object.keys(topics).forEach(key => {
-    const id = key === 'windSpeed' ? 'wind' : key;
-    const el = document.getElementById(id);
-    if (el) {
-      elements[key] = el;
-    } else {
-      console.warn(`[main.js] Elemento no encontrado: #${id}`);
-    }
-  });
-
-  // === Conexión MQTT ===
-  client.on("connect", () => {
-    console.log("✅ Conectado a broker.hivemq.com:8884");
-    Object.values(topics).forEach(topic => {
-      client.subscribe(topic, (err) => {
-        if (err) {
-          console.error("❌ Error al suscribirse a:", topic);
-        } else {
-          console.log("📌 Suscrito a:", topic);
-        }
-      });
-    });
-  });
-
-  // === Recibir mensajes ===
-  client.on("message", (topic, payload) => {
-    const value = payload.toString().trim();
-    if (!value) {
-      console.log("📩 Mensaje vacío recibido:", topic);
-      return;
-    }
-    console.log("📩 Recibido en", topic, "→", value);
-
-    const key = Object.keys(topics).find(k => topics[k] === topic);
-    const el = elements[key];
-    if (!el) return;
-
-    // Formato por tipo
-    if (key === "temp") el.textContent = `${value} °C`;
-    else if (key === "press") el.textContent = `${value} hPa`;
-    else if (key === "windSpeed") el.textContent = `${value} km/h`;
-    else if (key === "windDir") el.textContent = `${value} °`;
-    else if (key === "gas") el.textContent = `${value} kΩ`;
-    else if (key === "lluvia") el.textContent = `${value} mm`;
-    else el.textContent = value;
-  });
-
-  client.on("error", (err) => {
-    console.error("❌ Error MQTT:", err.message || err);
-  });
-
-  client.on("offline", () => {
-    console.warn("🌐 Cliente desconectado (modo offline)");
-  });
-
-  // === Modo claro/oscuro ===
   function loadTheme() {
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
@@ -118,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBackgroundEffects();
   }
 
-  // === Efectos visuales ===
   function updateBackgroundEffects() {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -159,12 +73,89 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === Inicializar tema y eventos ===
+  // ✅ Cargar tema y escuchar cambios
   loadTheme();
-
   if (checkbox) {
     checkbox.addEventListener("change", (e) => {
       setTheme(e.target.checked);
     });
   }
+
+  // === 2. Solo ejecutar MQTT si estamos en mqtt.html ===
+  if (window.location.pathname.includes("mqtt.html")) {
+    console.log("📡 Iniciando MQTT en mqtt.html");
+
+    // === Elementos de datos (solo en mqtt.html) ===
+    const elements = {};
+    const topics = {
+      temp: "horus/vvb/temperatura",
+      hum: "horus/vvb/humedad",
+      press: "horus/vvb/presion",
+      alt: "horus/vvb/altitud",
+      pm25: "horus/vvb/pm25",
+      pm10: "horus/vvb/pm10",
+      windSpeed: "horus/vvb/wind_speed",
+      windDir: "horus/vvb/wind_direction",
+      gas: "horus/vvb/gas",
+      lluvia: "horus/vvb/lluvia"
+    };
+
+    Object.keys(topics).forEach(key => {
+      const id = key === 'windSpeed' ? 'wind' : key;
+      const el = document.getElementById(id);
+      if (el) {
+        elements[key] = el;
+      } else {
+        console.warn(`[main.js] Elemento no encontrado: #${id} (en mqtt.html)`);
+      }
+    });
+
+    // === Conexión MQTT ===
+    const broker = "wss://broker.hivemq.com:8884/mqtt";
+    const clientId = "webClient_" + Math.random().toString(16).substr(2, 8);
+
+    const client = mqtt.connect(broker, {
+      clientId: clientId,
+      clean: true,
+      connectTimeout: 10000,
+      reconnectPeriod: 3000,
+      protocolVersion: 4
+    });
+
+    client.on("connect", () => {
+      console.log("✅ Conectado a broker.hivemq.com:8884");
+      Object.values(topics).forEach(topic => {
+        client.subscribe(topic, (err) => {
+          if (err) {
+            console.error("❌ Error al suscribirse a:", topic);
+          } else {
+            console.log("📌 Suscrito a:", topic);
+          }
+        });
+      });
+    });
+
+    client.on("message", (topic, payload) => {
+      const value = payload.toString().trim();
+      if (!value) return;
+      console.log("📩", topic, value);
+
+      const key = Object.keys(topics).find(k => topics[k] === topic);
+      const el = elements[key];
+      if (!el) return;
+
+      if (key === "temp") el.textContent = `${value} °C`;
+      else if (key === "press") el.textContent = `${value} hPa`;
+      else if (key === "windSpeed") el.textContent = `${value} km/h`;
+      else if (key === "windDir") el.textContent = `${value} °`;
+      else if (key === "gas") el.textContent = `${value} kΩ`;
+      else if (key === "lluvia") el.textContent = `${value} mm`;
+      else el.textContent = value;
+    });
+
+    client.on("error", (err) => {
+      console.error("❌ Error MQTT:", err.message || err);
+    });
+  }
+  // Fin del bloque MQTT (solo en mqtt.html)
 });
