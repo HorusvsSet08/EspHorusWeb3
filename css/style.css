@@ -777,3 +777,92 @@ body.dark-mode .connection-status-small .last-update {
   top: -0.35em !important;
   left: -0.35em !important;
 }
+
+/* === Ajustes para modo oscuro (mejor visibilidad del texto) === */
+body.dark-mode {
+  color: #e6edf3; /* Blanco azulado, más cómodo para la vista */
+  background: linear-gradient(135deg, #121212 0%, #1a1a2e 100%); /* Fondo profundo pero con profundidad */
+}
+
+/* === Mejora de contraste en tarjetas (modo oscuro) === */
+body.dark-mode .data-card {
+  background: rgba(30, 30, 40, 0.9); /* Fondo oscuro con un toque de transparencia */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: #ffffff; /* Texto blanco puro */
+}
+
+/* Texto secundario (etiquetas) */
+body.dark-mode .data-card span {
+  color: #bdc3c7; /* Gris claro */
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Sombra para mejorar legibilidad */
+}
+
+/* Texto principal (valores) */
+body.dark-mode .data-card strong {
+  color: #5dade2; /* Azul claro brillante */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* === Mejora de encabezados y títulos === */
+body.dark-mode header h1 {
+  color: #5dade2;
+  text-shadow: 0 0 10px rgba(93, 173, 226, 0.4);
+}
+
+body.dark-mode section h2 {
+  color: #5dade2;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+/* === Mejora del nav en modo oscuro === */
+body.dark-mode .nav {
+  background: rgba(20, 20, 30, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .nav-btn {
+  color: white;
+}
+
+body.dark-mode .nav-btn.active {
+  background: rgba(93, 173, 226, 0.6);
+  box-shadow: 0 0 12px rgba(93, 173, 226, 0.5);
+}
+
+/* === Mejora del estado de conexión === */
+body.dark-mode .connection-status-small {
+  color: #d0d0d0;
+  background: rgba(25, 25, 35, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .connection-status-small .last-update {
+  color: #95a5a6;
+}
+
+/* === Mejora del footer === */
+body.dark-mode footer {
+  color: #bdc3c7;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode footer code {
+  background: #2d3436;
+  color: #ffffff;
+}
+
+/* === Evitar texto gris sobre gris === */
+body.dark-mode * {
+  text-shadow: none; /* Removemos sombras que empeoran la lectura */
+}
+
+/* Aseguramos contraste alto en todo el texto */
+body.dark-mode p,
+body.dark-mode li,
+body.dark-mode strong,
+body.dark-mode span {
+  color: #ffffff !important;
+}
