@@ -1,9 +1,21 @@
-// main.js
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🟢 main.js: Página cargada e inicializando...");
+
   const body = document.body;
   const checkbox = document.querySelector(".theme-switch__checkbox");
 
-  // === Cargar tema desde localStorage ===
+  if (!body) {
+    console.error("❌ ERROR FATAL: No se encontró <body>");
+    return;
+  }
+
+  // === Elementos de UI (solo en mqtt.html) ===
+  let connectionStatus = null;
+  let statusText = null;
+  let lastUpdate = null;
+  let lastDataTime = null;
+
+  // === Cargar tema guardado ===
   const isDark = localStorage.getItem("darkMode") === "true";
   body.classList.toggle("dark-mode", isDark);
   body.classList.toggle("light-mode", !isDark);
@@ -12,66 +24,112 @@ document.addEventListener("DOMContentLoaded", () => {
     checkbox.checked = isDark;
   }
 
-  // === Escuchar cambios en el switch ===
-  if (checkbox) {
-    checkbox.addEventListener("change", (e) => {
-      const isChecked = e.target.checked;
+  // === Crear estado de conexión (solo en mqtt.html) ===
+  if (window.location.pathname.includes("mqtt.html")) {
+    connectionStatus = document.createElement('div');
+    connectionStatus.className = 'connection-status-small';
+    connectionStatus.innerHTML = `
+      <span class="status-dot"></span>
+      <span class="status-text">Desconectado</span>
+      <div class="last-update">última: nunca</div>
+    `;
+    document.querySelector('header')?.after(connectionStatus);
 
-      // Aplicar clase
-      body.classList.toggle("dark-mode", isChecked);
-      body.classList.toggle("light-mode", !isChecked);
+    statusText = connectionStatus.querySelector('.status-text');
+    lastUpdate = connectionStatus.querySelector('.last-update');
 
-      // Guardar preferencia
-      localStorage.setItem("darkMode", isChecked);
-
-      // Actualizar efectos visuales
-      updateVisualEffects(isChecked);
-    });
+    // Actualizar tiempo desde último dato
+    const updateLastUpdate = () => {
+      if (!lastDataTime) {
+        lastUpdate.textContent = 'última: nunca';
+        return;
+      }
+      const diff = Math.floor((Date.now() - lastDataTime) / 1000);
+      lastUpdate.textContent = `última: hace ${diff}s`;
+    };
+    setInterval(updateLastUpdate, 1000);
   }
 
-  // === Efectos visuales (partículas o lluvia) ===
-  function updateVisualEffects(isDark) {
-    document.querySelector('.particles')?.remove();
-    document.querySelector('.rain')?.remove();
+  // === Aplicar tema y efectos visuales ===
+  function setTheme(isDarkMode) {
+    body.classList.toggle("dark-mode", isDarkMode);
+    body.classList.toggle("light-mode", !isDarkMode);
+    localStorage.setItem("darkMode", isDarkMode);
 
-    if (!isDark) {
-      createParticles();
-    } else {
+    // Actualizar efectos
+    updateVisualEffects(isDarkMode);
+  }
+
+  // === Efectos visuales (nubes, partículas, lluvia, rayos) ===
+  function updateVisualEffects(isDarkMode) {
+    // Limpiar efectos anteriores
+    document.querySelectorAll('.particles, .rain, .cloud').forEach(el => el.remove());
+    document.body.style.setProperty('--lightning-delay', Math.random() * 10 + 's');
+
+    if (isDarkMode) {
       createRain();
+      // Activar rayos (el CSS ya los controla con animation-delay aleatorio)
+    } else {
+      createParticles();
+      createClouds();
     }
   }
 
+  // === Nubes en modo claro ===
+  function createClouds() {
+    for (let i = 0; i < 5; i++) {
+      const cloud = document.createElement('div');
+      cloud.classList.add('cloud');
+      cloud.style.setProperty('--delay', Math.random());
+      cloud.style.top = (Math.random() * 30 + 10) + 'vh';
+      cloud.style.opacity = 0.6 + Math.random() * 0.4;
+      document.body.appendChild(cloud);
+    }
+  }
+
+  // === Partículas en modo claro ===
   function createParticles() {
     const particles = document.createElement('div');
     particles.classList.add('particles');
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
       const dot = document.createElement('div');
       dot.classList.add('particle');
       dot.style.left = Math.random() * 100 + 'vw';
       dot.style.top = Math.random() * 100 + 'vh';
       dot.style.opacity = Math.random() * 0.5 + 0.3;
       dot.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      dot.style.setProperty('--delay', Math.random());
       particles.appendChild(dot);
     }
     document.body.appendChild(particles);
   }
 
+  // === Lluvia en modo oscuro ===
   function createRain() {
     const rain = document.createElement('div');
     rain.classList.add('rain');
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 40; i++) {
       const drop = document.createElement('div');
       drop.classList.add('raindrop');
       drop.style.left = Math.random() * 100 + 'vw';
       drop.style.animationDuration = (Math.random() * 2 + 1) + 's';
       drop.style.opacity = Math.random() * 0.6 + 0.4;
+      drop.style.animationDelay = (Math.random() * 3) + 's';
+      drop.style.setProperty('--delay', Math.random());
       rain.appendChild(drop);
     }
     document.body.appendChild(rain);
   }
 
-  // Inicializar efectos al cargar
-  updateVisualEffects(isDark);
+  // === Escuchar cambios en el switch ===
+  if (checkbox) {
+    checkbox.addEventListener("change", (e) => {
+      setTheme(e.target.checked);
+    });
+  }
+
+  // === Inicializar efectos al cargar ===
+  setTheme(isDark); // Esto llama a updateVisualEffects
 
   // === Solo en mqtt.html: conectar a MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
@@ -111,6 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     client.on("connect", () => {
       console.log("✅ Conectado a broker.hivemq.com:8884");
+      statusText.textContent = "Conectado";
+      connectionStatus.classList.add('connected');
       Object.values(topics).forEach(topic => {
         client.subscribe(topic, (err) => {
           if (err) {
@@ -137,38 +197,19 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "gas") el.textContent = `${value} kΩ`;
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
+
+      lastDataTime = Date.now(); // Marcar tiempo del último dato
     });
 
     client.on("error", (err) => {
       console.error("❌ Error MQTT:", err.message || err);
+      statusText.textContent = "Error";
+      connectionStatus.classList.remove('connected');
+    });
+
+    client.on("close", () => {
+      statusText.textContent = "Desconectado";
+      connectionStatus.classList.remove('connected');
     });
   }
 });
-
-// === Crear nubes en modo claro ===
-function createClouds() {
-  document.querySelectorAll('.cloud').forEach(el => el.remove());
-
-  for (let i = 0; i < 5; i++) {
-    const cloud = document.createElement('div');
-    cloud.classList.add('cloud');
-    cloud.style.animationDelay = (Math.random() * 40) + 's';
-    cloud.style.top = (Math.random() * 30 + 10) + 'vh';
-    cloud.style.opacity = 0.7 + Math.random() * 0.3;
-    document.body.appendChild(cloud);
-  }
-}
-
-// === Actualizar efectos visuales ===
-function updateBackgroundEffects() {
-  document.querySelector('.particles')?.remove();
-  document.querySelector('.rain')?.remove();
-  document.querySelectorAll('.cloud').forEach(el => el.remove());
-
-  if (body.classList.contains('light-mode')) {
-    createParticles();
-    createClouds();
-  } else {
-    createRain();
-  }
-}
