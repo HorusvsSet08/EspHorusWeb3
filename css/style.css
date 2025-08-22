@@ -1,7 +1,5 @@
-/* === Google Fonts === */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500&display=swap');
 
-/* === Reset y base === */
 * {
   margin: 0;
   padding: 0;
@@ -18,32 +16,17 @@ body {
   color: #2c3e50;
 }
 
-/* === FONDOS: Cielo azul profundo (claro) y Tormenta (oscuro) === */
-
-/* --- Modo claro: Cielo azul profundo (más oscuro y realista) --- */
+/* === FONDOS === */
 body.light-mode {
-  background: linear-gradient(180deg,
-    #7aa8d8 0%,
-    #5d8ec1 25%,
-    #3a76b0 50%,
-    #2c5f90 75%,
-    #1e4a72 100%
-  );
+  background: linear-gradient(180deg, #a8d8f0 0%, #7bb8e0 30%, #5dade2 70%, #357abd 100%);
   background-size: 400% 400%;
   animation: gradient-shift 18s ease infinite;
-  color: #ffffff;
 }
 
-/* --- Modo oscuro: Noche de tormenta --- */
 body.dark-mode {
-  background: linear-gradient(135deg,
-    #1a2530 0%,
-    #0d1b2a 50%,
-    #0a101f 100%
-  );
+  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
   background-size: 400% 400%;
   animation: gradient-shift 20s ease infinite;
-  color: #e6edf3;
 }
 
 @keyframes gradient-shift {
@@ -52,7 +35,6 @@ body.dark-mode {
   100% { background-position: 0% 50%; }
 }
 
-/* === Fondo semitransparente para contraste === */
 body::before {
   content: "";
   position: fixed;
@@ -74,125 +56,7 @@ body.dark-mode::before {
   backdrop-filter: blur(10px);
 }
 
-/* === NUBES MEJORADAS (modo claro) === */
-.cloud {
-  position: fixed;
-  top: 10vh;
-  left: -200px;
-  width: 400px;
-  height: 140px;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.95;
-  filter: blur(1.5px);
-  animation: moveCloud 60s linear infinite;
-  animation-delay: calc(var(--delay) * 15s);
-  transform: scale(1);
-}
-
-.cloud::before,
-.cloud::after,
-.cloud span {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
-}
-
-/* Partes de la nube */
-.cloud::before {
-  width: 110px;
-  height: 110px;
-  top: 50px;
-  left: 70px;
-}
-
-.cloud::after {
-  width: 150px;
-  height: 150px;
-  top: 25px;
-  left: 110px;
-}
-
-.cloud span {
-  width: 170px;
-  height: 100px;
-  top: 35px;
-  left: 140px;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  box-shadow: 0 0 35px rgba(255, 255, 255, 0.9);
-}
-
-@keyframes moveCloud {
-  0% { transform: translateX(-200px); }
-  100% { transform: translateX(110vw); }
-}
-
-/* === Partículas (modo claro) === */
-.particles {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: rgba(52, 152, 219, 0.7);
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: 0.8;
-  animation: float-fast 6s infinite ease-in-out;
-  animation-delay: calc(var(--delay) * 5s);
-}
-
-@keyframes float-fast {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-50px) translateX(30px) rotate(180deg);
-  }
-}
-
-/* === Lluvia (modo oscuro) === */
-.rain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.raindrop {
-  position: absolute;
-  width: 1px;
-  height: 20px;
-  background: linear-gradient(transparent, rgba(173, 216, 230, 0.9));
-  border-radius: 0 0 5px 5px;
-  filter: blur(0.5px);
-  opacity: 0.6;
-  animation: fall 2s linear infinite;
-  animation-delay: calc(var(--delay) * 3s);
-}
-
-@keyframes fall {
-  0% { transform: translateY(-20px); opacity: 0.2; }
-  50% { opacity: 0.8; }
-  100% { transform: translateY(100vh); opacity: 0.2; }
-}
-
-/* === Rayos mejorados (modo oscuro) === */
+/* === RELÁMPAGOS === */
 body.dark-mode::after {
   content: "";
   position: fixed;
@@ -203,23 +67,82 @@ body.dark-mode::after {
   pointer-events: none;
   opacity: 0;
   z-index: -1;
-  background: radial-gradient(
-    ellipse at var(--x, 50%) var(--y, 30%),
-    rgba(255, 255, 255, 0.95),
-    rgba(200, 230, 255, 0.5) 15%,
-    transparent 70%
-  );
-  animation: lightning-flash 0.3s ease-out forwards;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.7), transparent 70%);
+  animation: lightning 8s infinite;
+  animation-delay: var(--lightning-delay, 2s);
 }
 
-@keyframes lightning-flash {
-  0% { opacity: 0; }
-  40% { opacity: 0.9; }
-  60% { opacity: 0.6; }
-  100% { opacity: 0; }
+@keyframes lightning {
+  0%, 98%, 100% { opacity: 0; }
+  97% { opacity: 0.8; }
 }
 
-/* === Contenedor principal === */
+/* === NUBES === */
+.cloud {
+  position: fixed;
+  top: 15vh;
+  left: -100px;
+  width: 300px;
+  height: 100px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.7;
+  animation: moveCloud 60s linear infinite;
+  animation-delay: calc(var(--delay) * 10s);
+}
+
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.cloud::before { width: 80px; height: 80px; top: 40px; left: 50px; }
+.cloud::after { width: 120px; height: 120px; top: 20px; left: 80px; }
+
+@keyframes moveCloud {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(110vw); }
+}
+
+/* === PARTÍCULAS === */
+.particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+.particle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: rgba(52, 152, 219, 0.7);
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.8;
+  animation: float-fast 6s infinite ease-in-out;
+  animation-delay: calc(var(--delay) * 5s);
+}
+@keyframes float-fast {
+  0%,100% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(-50px) translateX(30px) rotate(180deg); }
+}
+
+/* === LLUVIA === */
+.rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+.raindrop {
+  position: absolute;
+  width: 1px; height: 20px;
+  background: linear-gradient(transparent, rgba(173, 216, 230, 0.9));
+  border-radius: 0 0 5px 5px;
+  filter: blur(0.5px);
+  opacity: 0.6;
+  animation: fall 2s linear infinite;
+  animation-delay: calc(var(--delay) * 3s);
+}
+@keyframes fall {
+  0% { transform: translateY(-20px); opacity: 0.2; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(100vh); opacity: 0.2; }
+}
+
+/* === CONTENEDOR === */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -229,7 +152,7 @@ body.dark-mode::after {
   z-index: 1;
 }
 
-/* === Encabezado === */
+/* === ENCABEZADO === */
 header h1 {
   font-family: 'Orbitron', sans-serif;
   font-size: 2.8rem;
@@ -243,56 +166,7 @@ body.dark-mode header h1 {
   text-shadow: 0 0 15px rgba(135, 206, 250, 0.5);
 }
 
-/* === Estado de conexión (abajo del nav) === */
-.connection-status-small {
-  text-align: center;
-  padding: 0.5rem 0;
-  font-size: 0.95rem;
-  color: #7f8c8d;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  position: sticky;
-  top: 80px;
-  z-index: 99;
-  margin: 0;
-}
-
-.connection-status-small .status-dot {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  background: #e74c3c;
-  border-radius: 50%;
-  margin-right: 6px;
-  animation: pulse 1.5s infinite;
-}
-
-.connection-status-small.connected .status-dot {
-  background: #2ecc71;
-  animation: none;
-}
-
-.connection-status-small .status-text {
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-body.dark-mode .connection-status-small .status-text {
-  color: #e6edf3;
-}
-
-.connection-status-small .last-update {
-  font-size: 0.8rem;
-  color: #95a5a6;
-  margin-top: 0.2rem;
-}
-
-body.dark-mode .connection-status-small .last-update {
-  color: #7f8c8d;
-}
-
-/* === Tarjetas de datos === */
+/* === TARJETAS === */
 #weather-data {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -347,7 +221,7 @@ body.dark-mode .data-card strong {
   text-shadow: 0 0 8px rgba(93, 173, 226, 0.4);
 }
 
-/* === Navegación más grande === */
+/* === NAV === */
 .nav {
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(14px);
@@ -417,7 +291,7 @@ body.dark-mode .nav {
   flex-shrink: 0;
 }
 
-/* === Switch de Galahad === */
+/* === SWITCH GALAHAD === */
 .theme-switch {
   --toggle-size: 26px;
   --container-width: 5em;
@@ -586,7 +460,7 @@ body.dark-mode .nav {
   transform: translateY(-50%) scale(1.1);
 }
 
-/* === Footer === */
+/* === FOOTER === */
 footer {
   text-align: center;
   margin-top: 3rem;
@@ -614,7 +488,6 @@ body.dark-mode footer code {
   color: #e6edf3;
 }
 
-/* === Responsive === */
 @media (max-width: 768px) {
   .nav { padding: 1.2rem 1.5rem; height: 76px; }
   .nav-btn { font-size: 0.95rem; padding: 0.6rem 1rem; gap: 0.5rem; }
