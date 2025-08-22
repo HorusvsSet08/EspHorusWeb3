@@ -96,3 +96,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const broker = "wss://broker.hivemq.com:8884/mqtt";
     const client = mqtt.connect(broker, {
       clientId: "webClient_" + Math.random().toString(16).substr(2, 8),
+      protocolVersion: 4,
+      clean: true,
+      connectTimeout: 10000,
+      reconnectPeriod: 3000
+    });
+
+    const topics = {
+      temp: "horus/vvb/temperatura",
+      hum: "horus/vvb/humedad",
+      press: "horus/vvb/presion",
+      alt: "horus/vvb/altitud",
+      pm25: "horus/vvb/pm25",
+      pm10: "horus/vvb/pm10",
+      windSpeed: "horus/vvb/wind_speed",
+      windDir: "horus/vvb/wind_direction",
+      gas: "horus/vvb/gas",
+      lluvia: "horus/vvb/lluvia"
+    };
+
+    const elements = {};
+    Object.keys(topics).forEach(key => {
+      const id = key === 'windSpeed' ? 'wind' : key;
+      const el = document.getElementById(id);
+      if (el) elements[key] = el;
+    });
+
+    client.on("connect", () => {
+      console.log("✅ Conectado a broker.hivemq.com:8884");
+      Object.values(topics).forEach(topic => {
+        client.subscribe(topic, (err) => {
+          if (err) {
+            console.error("❌ Error al suscribirse a:", topic);
+          } else {
+            console.log("📌 Suscrito a:", topic);
+          }
+        });
+      });
+    });
+
+    client.on("message", (topic, payload) => {
+      const value = payload.toString().trim();
+      if (!value) return;
+
+      const key = Object.keys(topics).find(k => topics[k] === topic);
+      const el = elements[key];
+      if (!el) return;
+
+      if (key === "temp") el.textContent = `${value} °C`;
+      else if (key === "press") el.textContent = `${value} hPa`;
+      else if (key === "windSpeed") el.textContent = `${value} km/h`;
+      else if (key === "windDir") el.textContent = `${value} °`;
+      else if (key === "gas") el.textContent = `${value} kΩ`;
+      else if (key === "lluvia") el.textContent = `${value} mm`;
+      else el.textContent = value;
+    });
+
+    client.on("error", (err) => {
+      console.error("❌ Error MQTT:", err.message || err);
+    });
+  }
+});
