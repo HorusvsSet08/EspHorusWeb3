@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Estación Meteorológica Horus</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script src="js/mqtt.js"></script>
-  <script src="js/main.js"></script>
+  <title>Datos en Vivo - Horus</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <script src="../js/mqtt.js"></script>
+  <script src="../js/main.js"></script>
 </head>
 <body class="light-mode">
   <nav class="nav">
     <div class="nav-container">
       <!-- Botones en fila -->
       <div class="nav-buttons">
-        <a href="index.html" class="nav-btn active">
+        <a href="../index.html" class="nav-btn">
           <span class="nav-icon">🏠</span> Inicio
         </a>
-        <a href="html/mqtt.html" class="nav-btn">
+        <a href="mqtt.html" class="nav-btn active">
           <span class="nav-icon">📡</span> Datos en Vivo
         </a>
       </div>
@@ -50,37 +50,31 @@
 
   <div class="container">
     <header>
-      <h1>🌦️ Estación Meteorológica Horus</h1>
+      <h1>📡 Datos en Tiempo Real</h1>
     </header>
 
-    <main>
-      <section class="intro">
-        <h2>¿Qué es una estación meteorológica?</h2>
-        <p>
-          Una <strong>estación meteorológica</strong> mide condiciones ambientales como temperatura, humedad, presión, viento, lluvia y calidad del aire. 
-          La estación <strong>Horus</strong> es un sistema IoT que envía datos en tiempo real usando <strong>MQTT</strong>.
-        </p>
-      </section>
+    <!-- Estado de conexión -->
+    <div class="connection-status">
+      <span class="dot"></span> Estado: Desconectado
+    </div>
+    <div class="last-update">Última actualización: nunca</div>
 
-      <section class="features">
-        <h2>📊 Sensores que monitorea</h2>
-        <ul>
-          <li>🌡️ Temperatura y humedad</li>
-          <li>🔽 Presión atmosférica y altitud</li>
-          <li>🌀 Velocidad y dirección del viento</li>
-          <li>🌧️ Precipitación (lluvia)</li>
-          <li>🌫️ Calidad del aire (PM2.5, PM10)</li>
-          <li>⛽ Niveles de gases</li>
-        </ul>
-      </section>
-
-      <section class="cta">
-        <p>👉 <a href="html/mqtt.html"><strong>Ver datos en tiempo real</strong></a></p>
-      </section>
+    <!-- Tarjetas de datos -->
+    <main id="weather-data">
+      <div class="data-card"><span>🌡️ Temperatura</span><strong id="temp">-- °C</strong></div>
+      <div class="data-card"><span>💧 Humedad</span><strong id="hum">-- %</strong></div>
+      <div class="data-card"><span>🔽 Presión</span><strong id="press">-- hPa</strong></div>
+      <div class="data-card"><span>⛰️ Altitud</span><strong id="alt">-- m</strong></div>
+      <div class="data-card"><span>🌫️ PM2.5</span><strong id="pm25">-- µg/m³</strong></div>
+      <div class="data-card"><span>🌫️ PM10</span><strong id="pm10">-- µg/m³</strong></div>
+      <div class="data-card"><span>🌀 Viento</span><strong id="wind">-- km/h</strong></div>
+      <div class="data-card"><span>🧭 Dirección</span><strong id="windDir">-- °</strong></div>
+      <div class="data-card"><span>⛽ Gas</span><strong id="gas">-- kΩ</strong></div>
+      <div class="data-card"><span>🌧️ Lluvia</span><strong id="lluvia">-- mm</strong></div>
     </main>
 
     <footer>
-      <p>Estación Horus • Diseñada con ❤️ para monitoreo ambiental</p>
+      <p>Conectado vía MQTT a <code>broker.hivemq.com</code></p>
     </footer>
   </div>
 </body>
