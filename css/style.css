@@ -990,3 +990,124 @@ body.dark-mode::before {
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
+
+/* === Navegación más grande y moderna === */
+.nav {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.2rem 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 72px; /* Más alto */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
+  transition: all 0.4s ease;
+}
+
+body.dark-mode .nav {
+  background: rgba(18, 18, 18, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1.2rem;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.3rem;
+  border-radius: 10px;
+  font-weight: 500;
+  background: rgba(52, 152, 219, 0.3);
+  transition: all 0.3s ease;
+  font-size: 1.05rem;
+}
+
+.nav-btn:hover {
+  background: rgba(52, 152, 219, 0.5);
+  transform: translateY(-2px);
+}
+
+.nav-btn.active {
+  background: rgba(52, 152, 219, 0.8);
+  box-shadow: 0 0 16px rgba(52, 152, 219, 0.6);
+  font-weight: 600;
+}
+
+.nav-icon {
+  font-size: 1.3em;
+}
+
+.nav-right {
+  flex-shrink: 0;
+}
+
+/* === Fondo modo claro: azul cielo con degradado suave === */
+body.light-mode {
+  background: linear-gradient(135deg, 
+    #a8d8f0 0%,   /* Azul cielo claro */
+    #7bb8e0 30%,  /* Azul medio */
+    #5dade2 60%,  /* Azul brillante */
+    #357abd 100%  /* Azul profundo */
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 18s ease infinite;
+  color: #1a508b;
+}
+
+/* Animación del degradado */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === Fondo modo oscuro (tormenta) === */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 20s ease infinite;
+  color: #e6edf3;
+}
+
+/* === Capa de contraste para texto legible === */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+
+body.light-mode::before {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+body.dark-mode::before {
+  background: rgba(10, 15, 25, 0.85);
+  backdrop-filter: blur(10px);
+}
