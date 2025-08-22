@@ -625,3 +625,46 @@ body.dark-mode::before {
 body.dark-mode, body.dark-mode p, body.dark-mode li, body.dark-mode strong, body.dark-mode span {
   color: #e6edf3 !important;
 }
+
+/* === Fondos con gradiente animado === */
+
+/* --- Modo claro: azul cielo suave --- */
+body.light-mode {
+  background: linear-gradient(135deg, #d6eaf8 0%, #85c1e9 30%, #5dade2 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  color: #1a508b;
+}
+
+/* --- Modo oscuro: negro tormenta (azul oscuro profundo) --- */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a2530 0%, #111827 50%, #0f131a 100%);
+  background-size: 400% 400%;
+  animation: gradient-shift 20s ease infinite;
+  color: #e6edf3;
+}
+
+/* Animación de fondo (suave) */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === Fondo semitransparente para contraste (mejora legibilidad) === */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  z-index: -2;
+  pointer-events: none;
+}
+
+body.dark-mode::before {
+  background: rgba(10, 15, 25, 0.85);
+}
