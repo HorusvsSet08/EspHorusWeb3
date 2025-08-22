@@ -614,3 +614,63 @@ body.dark-mode .nav {
     font-size: 1.1em;
   }
 }
+
+/* === Estrellas mejoradas (más brillantes y animadas) === */
+.theme-switch__stars-container {
+  position: absolute;
+  top: -100%;
+  left: 0.312em;
+  width: 2.75em;
+  height: auto;
+  opacity: 0;
+  transition: var(--transition);
+  pointer-events: none;
+}
+
+/* Hacer que las estrellas brillen con animación */
+.theme-switch__stars-container svg {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.6));
+  }
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1));
+  }
+}
+
+/* Aparecer con fade y escala */
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+  top: 50%;
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* === Partículas más rápidas y fluidas === */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(52, 152, 219, 0.7);
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.8;
+  animation: float-fast 6s infinite ease-in-out;
+  animation-delay: calc(var(--delay) * 4s);
+}
+
+@keyframes float-fast {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50px) translateX(30px) rotate(180deg);
+  }
+}
