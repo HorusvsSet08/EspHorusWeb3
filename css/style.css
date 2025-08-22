@@ -18,17 +18,31 @@ body {
   color: #2c3e50;
 }
 
-/* === Fondos con gradiente animado === */
+/* === FONDOS: Azul cielo (claro) y Tormenta (oscuro) === */
+
+/* --- Modo claro: Cielo azul con degradado animado --- */
 body.light-mode {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(180deg,
+    #a8d8f0 0%,
+    #7bb8e0 30%,
+    #5dade2 70%,
+    #357abd 100%
+  );
   background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
+  animation: gradient-shift 18s ease infinite;
+  color: #1a508b;
 }
 
+/* --- Modo oscuro: Noche de tormenta --- */
 body.dark-mode {
-  background: linear-gradient(135deg, #121212 0%, #1a1a2e 100%);
+  background: linear-gradient(135deg,
+    #1a2530 0%,
+    #0d1b2a 50%,
+    #0a101f 100%
+  );
   background-size: 400% 400%;
   animation: gradient-shift 20s ease infinite;
+  color: #e6edf3;
 }
 
 @keyframes gradient-shift {
@@ -37,7 +51,7 @@ body.dark-mode {
   100% { background-position: 0% 50%; }
 }
 
-/* === Fondo semitransparente para contraste (mejor legibilidad) === */
+/* === Fondo semitransparente para contraste (mejora legibilidad) === */
 body::before {
   content: "";
   position: fixed;
@@ -45,17 +59,84 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
   z-index: -2;
   pointer-events: none;
 }
 
-body.dark-mode::before {
-  background: rgba(18, 18, 18, 0.85);
+body.light-mode::before {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
 }
 
-/* === Partículas mejoradas (modo claro) === */
+body.dark-mode::before {
+  background: rgba(10, 15, 25, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+/* === Relámpagos en modo oscuro (tormenta) === */
+body.dark-mode::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.7), transparent 70%);
+  animation: lightning 8s infinite;
+  animation-delay: var(--lightning-delay, 2s);
+}
+
+@keyframes lightning {
+  0%, 98%, 100% { opacity: 0; }
+  97% { opacity: 0.8; }
+}
+
+/* === Nubes pasando en modo claro === */
+.cloud {
+  position: fixed;
+  top: 15vh;
+  left: -100px;
+  width: 300px;
+  height: 100px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.7;
+  animation: moveCloud 60s linear infinite;
+  animation-delay: calc(var(--delay) * 10s);
+}
+
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.cloud::before {
+  width: 80px;
+  height: 80px;
+  top: 40px;
+  left: 50px;
+}
+
+.cloud::after {
+  width: 120px;
+  height: 120px;
+  top: 20px;
+  left: 80px;
+}
+
+@keyframes moveCloud {
+  0% { transform: translateX(-100px); }
+  100% { transform: translateX(110vw); }
+}
+
+/* === Partículas (modo claro) === */
 .particles {
   position: fixed;
   top: 0;
@@ -88,7 +169,7 @@ body.dark-mode::before {
   }
 }
 
-/* === Lluvia mejorada (modo oscuro) === */
+/* === Lluvia (modo oscuro) === */
 .rain {
   position: fixed;
   top: 0;
@@ -138,25 +219,29 @@ header h1 {
   text-shadow: 0 0 10px rgba(93, 173, 226, 0.4);
 }
 
-/* === Estado de conexión pequeño (abajo del nav) === */
+body.dark-mode header h1 {
+  text-shadow: 0 0 15px rgba(135, 206, 250, 0.5);
+}
+
+/* === Estado de conexión (abajo del nav) === */
 .connection-status-small {
   text-align: center;
-  padding: 0.4rem 0;
+  padding: 0.5rem 0;
   font-size: 0.95rem;
   color: #7f8c8d;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: sticky;
-  top: 60px;
+  top: 80px;
   z-index: 99;
   margin: 0;
 }
 
 .connection-status-small .status-dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   background: #e74c3c;
   border-radius: 50%;
   margin-right: 6px;
@@ -173,30 +258,18 @@ header h1 {
   color: #2c3e50;
 }
 
+body.dark-mode .connection-status-small .status-text {
+  color: #e6edf3;
+}
+
 .connection-status-small .last-update {
   font-size: 0.8rem;
   color: #95a5a6;
   margin-top: 0.2rem;
 }
 
-/* === Modo oscuro: mejora de legibilidad === */
-body.dark-mode {
-  color: #e6edf3;
-}
-
-body.dark-mode header h1 {
-  color: #5dade2;
-  text-shadow: 0 0 10px rgba(93, 173, 226, 0.4);
-}
-
-body.dark-mode .connection-status-small {
-  color: #d0d0d0;
-  background: rgba(25, 25, 35, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 body.dark-mode .connection-status-small .last-update {
-  color: #95a5a6;
+  color: #7f8c8d;
 }
 
 /* === Tarjetas de datos === */
@@ -219,8 +292,9 @@ body.dark-mode .connection-status-small .last-update {
 }
 
 body.dark-mode .data-card {
-  background: rgba(30, 30, 40, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 30, 45, 0.9);
+  border: 1px solid rgba(93, 173, 226, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(52, 152, 219, 0.1);
   color: #ffffff;
 }
 
@@ -238,7 +312,7 @@ body.dark-mode .data-card {
 }
 
 body.dark-mode .data-card span {
-  color: #bdc3c7;
+  color: #a8d0f0;
 }
 
 .data-card strong {
@@ -250,31 +324,31 @@ body.dark-mode .data-card span {
 
 body.dark-mode .data-card strong {
   color: #5dade2;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 0 8px rgba(93, 173, 226, 0.4);
 }
 
-/* === Navegación mejorada (botones en fila, switch ajustado) === */
+/* === Navegación más grande y moderna === */
 .nav {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.4rem 2rem;
   font-family: 'Segoe UI', sans-serif;
   position: sticky;
   top: 0;
   z-index: 100;
-  height: 60px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   transition: all 0.4s ease;
 }
 
 body.dark-mode .nav {
-  background: rgba(18, 18, 18, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(18, 18, 18, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
 
 .nav-container {
@@ -284,52 +358,50 @@ body.dark-mode .nav {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  gap: 1rem;
 }
 
 .nav-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 1.4rem;
 }
 
 .nav-btn {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
   color: white;
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 12px;
   font-weight: 500;
-  background: rgba(52, 152, 219, 0.25);
+  background: rgba(52, 152, 219, 0.35);
   transition: all 0.3s ease;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .nav-btn:hover {
-  background: rgba(52, 152, 219, 0.5);
+  background: rgba(52, 152, 219, 0.6);
 }
 
 .nav-btn.active {
-  background: rgba(52, 152, 219, 0.7);
-  box-shadow: 0 0 12px rgba(52, 152, 219, 0.6);
-  color: white;
+  background: rgba(52, 152, 219, 0.9);
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.7);
   font-weight: 600;
 }
 
 .nav-icon {
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 .nav-right {
   flex-shrink: 0;
 }
 
-/* === Switch de Galahad (ajustado para caber mejor) === */
+/* === Switch de Galahad (ajustado para el nav grande) === */
 .theme-switch {
-  --toggle-size: 24px;
-  --container-width: 4.8em;
-  --container-height: 2.1em;
+  --toggle-size: 26px;
+  --container-width: 5em;
+  --container-height: 2.3em;
   --container-radius: 6em;
   --container-light-bg: #3D7EAE;
   --container-night-bg: #1D1F2C;
@@ -343,170 +415,15 @@ body.dark-mode .nav {
   --circle-transition: 0.3s cubic-bezier(0, -0.02, 0.35, 1.17);
 }
 
-.theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-size: var(--toggle-size);
-}
-
 .theme-switch__container {
-  width: var(--container-width);
-  height: var(--container-height);
-  background-color: var(--container-light-bg);
-  border-radius: var(--container-radius);
-  overflow: hidden;
-  cursor: pointer;
-  -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-  position: relative;
-}
-
-.theme-switch__container::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
-  border-radius: var(--container-radius);
-}
-
-.theme-switch__checkbox {
-  display: none;
+  height: 2.3em !important;
 }
 
 .theme-switch__circle-container {
-  width: 2.8em;
-  height: 2.8em;
-  background-color: rgba(255, 255, 255, 0.1);
-  position: absolute;
-  left: -0.35em;
-  top: -0.35em;
-  border-radius: var(--container-radius);
-  -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1);
-  display: flex;
-  -webkit-transition: var(--circle-transition);
-  -o-transition: var(--circle-transition);
-  transition: var(--circle-transition);
-  pointer-events: none;
-}
-
-.theme-switch__sun-moon-container {
-  pointer-events: auto;
-  position: relative;
-  z-index: 2;
-  width: 2.125em;
-  height: 2.125em;
-  margin: auto;
-  border-radius: var(--container-radius);
-  background-color: var(--sun-bg);
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
-  -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
-  filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
-  overflow: hidden;
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-}
-
-.theme-switch__moon {
-  -webkit-transform: translateX(100%);
-  -ms-transform: translateX(100%);
-  transform: translateX(100%);
-  width: 100%;
-  height: 100%;
-  background-color: var(--moon-bg);
-  border-radius: inherit;
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-  position: relative;
-}
-
-.theme-switch__spot {
-  position: absolute;
-  top: 0.75em;
-  left: 0.312em;
-  width: 0.75em;
-  height: 0.75em;
-  border-radius: var(--container-radius);
-  background-color: var(--spot-color);
-  -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
-}
-
-.theme-switch__spot:nth-of-type(2) {
-  width: 0.375em;
-  height: 0.375em;
-  top: 0.937em;
-  left: 1.375em;
-}
-
-.theme-switch__spot:nth-last-of-type(3) {
-  width: 0.25em;
-  height: 0.25em;
-  top: 0.312em;
-  left: 0.812em;
-}
-
-.theme-switch__clouds {
-  width: 1.25em;
-  height: 1.25em;
-  background-color: var(--clouds-color);
-  border-radius: var(--container-radius);
-  position: absolute;
-  bottom: -0.625em;
-  left: 0.312em;
-  -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
-  box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
-  -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-  -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-  transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-}
-
-/* === Estrellas mejoradas (brillo pulsante) === */
-.theme-switch__stars-container {
-  position: absolute;
-  top: -100%;
-  left: 0.312em;
-  width: 2.75em;
-  height: auto;
-  opacity: 0;
-  transition: var(--transition);
-  pointer-events: none;
-}
-
-.theme-switch__stars-container svg {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8));
-  animation: twinkle 2s infinite alternate;
-}
-
-@keyframes twinkle {
-  0% {
-    opacity: 0.6;
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.6));
-  }
-  100% {
-    opacity: 1;
-    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1));
-  }
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
-  top: 50%;
-  opacity: 1;
-  transform: translateY(-50%) scale(1.1);
+  width: 2.9em !important;
+  height: 2.9em !important;
+  top: -0.3em !important;
+  left: -0.3em !important;
 }
 
 /* === Footer === */
@@ -540,16 +457,16 @@ body.dark-mode footer code {
 /* === Responsive (móvil) === */
 @media (max-width: 768px) {
   .nav {
-    padding: 0.8rem 1rem;
-    height: 60px;
+    padding: 1.2rem 1.5rem;
+    height: 76px;
   }
   .nav-btn {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.8rem;
-    gap: 0.4rem;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
   }
   .nav-icon {
-    font-size: 1.1em;
+    font-size: 1.3em;
   }
   header h1 {
     font-size: 2.2rem;
@@ -560,634 +477,4 @@ body.dark-mode footer code {
   .container {
     padding: 1rem;
   }
-}
-
-/* === Mejora de contraste en modo oscuro === */
-
-/* --- NAV: mejor contraste y visibilidad --- */
-body.dark-mode .nav {
-  background: rgba(30, 30, 40, 0.95) !important;
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-body.dark-mode .nav-btn {
-  background: rgba(52, 152, 219, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-body.dark-mode .nav-btn.active {
-  background: rgba(52, 152, 219, 0.7);
-  box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
-}
-
-/* --- Tarjetas de datos: mejor contraste --- */
-body.dark-mode .data-card {
-  background: rgba(35, 35, 50, 0.95) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  color: #ffffff;
-}
-
-body.dark-mode .data-card span {
-  color: #bdc3c7;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .data-card strong {
-  color: #5dade2;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* --- Partículas (modo claro) --- */
-body.light-mode .particle {
-  background: rgba(52, 152, 219, 0.6);
-  filter: blur(2px);
-  opacity: 0.7;
-}
-
-/* --- Lluvia (modo oscuro): hacer más visible --- */
-body.dark-mode .raindrop {
-  background: linear-gradient(transparent, rgba(173, 216, 230, 0.95));
-  filter: blur(0.8px);
-  opacity: 0.7;
-  width: 1.5px;
-  height: 22px;
-}
-
-/* --- Fondo semitransparente más claro en modo oscuro para destacar contenido --- */
-body.dark-mode::before {
-  background: rgba(20, 20, 30, 0.88);
-}
-
-/* --- Asegurar contraste en texto general --- */
-body.dark-mode, body.dark-mode p, body.dark-mode li, body.dark-mode strong, body.dark-mode span {
-  color: #e6edf3 !important;
-}
-
-/* === Fondos con gradiente animado === */
-
-/* --- Modo claro: azul cielo suave --- */
-body.light-mode {
-  background: linear-gradient(135deg, #d6eaf8 0%, #85c1e9 30%, #5dade2 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
-  color: #1a508b;
-}
-
-/* --- Modo oscuro: negro tormenta (azul oscuro profundo) --- */
-body.dark-mode {
-  background: linear-gradient(135deg, #1a2530 0%, #111827 50%, #0f131a 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 20s ease infinite;
-  color: #e6edf3;
-}
-
-/* Animación de fondo (suave) */
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* === Fondo semitransparente para contraste (mejora legibilidad) === */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(10px);
-  z-index: -2;
-  pointer-events: none;
-}
-
-body.dark-mode::before {
-  background: rgba(10, 15, 25, 0.85);
-}
-
-/* === Mejora de elementos en modo oscuro (tormenta) === */
-
-/* --- Tarjetas de datos --- */
-body.dark-mode .data-card {
-  background: rgba(20, 30, 45, 0.9);
-  border: 1px solid rgba(93, 173, 226, 0.3);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(52, 152, 219, 0.1);
-  color: #ffffff;
-}
-
-body.dark-mode .data-card span {
-  color: #a8d0f0;
-}
-
-body.dark-mode .data-card strong {
-  color: #5dade2;
-  text-shadow: 0 0 8px rgba(93, 173, 226, 0.4);
-}
-
-/* --- NAV en modo tormenta --- */
-body.dark-mode .nav {
-  background: rgba(15, 25, 40, 0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(93, 173, 226, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
-
-body.dark-mode .nav-btn {
-  background: rgba(52, 152, 219, 0.3);
-  border: 1px solid rgba(93, 173, 226, 0.3);
-}
-
-body.dark-mode .nav-btn.active {
-  background: rgba(52, 152, 219, 0.7);
-  box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
-}
-
-/* --- Efectos visuales --- */
-
-/* Partículas (modo claro - azul cielo) */
-body.light-mode .particle {
-  background: rgba(52, 152, 219, 0.6);
-  filter: blur(2px);
-  opacity: 0.7;
-}
-
-/* Lluvia (modo oscuro - tormenta) */
-body.dark-mode .raindrop {
-  background: linear-gradient(transparent, rgba(135, 206, 250, 0.95));
-  filter: blur(0.8px);
-  opacity: 0.7;
-  width: 1.5px;
-  height: 22px;
-  box-shadow: 0 0 3px rgba(135, 206, 250, 0.5);
-}
-
-/* --- Texto general en modo oscuro --- */
-body.dark-mode,
-body.dark-mode p,
-body.dark-mode li,
-body.dark-mode strong,
-body.dark-mode span {
-  color: #e6edf3 !important;
-}
-
-body.dark-mode header h1 {
-  color: #87cefa;
-  text-shadow: 0 0 15px rgba(135, 206, 250, 0.5);
-  font-weight: 600;
-}
-
-/* === FONDOS: Azul de día y Negro tormenta === */
-
-/* --- Modo claro: Cielo de día (azul suave) --- */
-body.light-mode {
-  background: linear-gradient(135deg, #d4e6f1 0%, #85c1e9 50%, #5dade2 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 18s ease infinite;
-  color: #1a508b;
-}
-
-/* --- Modo oscuro: Noche de tormenta (negro azulado profundo) --- */
-body.dark-mode {
-  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 20s ease infinite;
-  color: #e6edf3;
-}
-
-/* Animación suave del gradiente */
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* === Fondo semitransparente para contraste (mejora legibilidad) === */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  pointer-events: none;
-}
-
-body.light-mode::before {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-body.dark-mode::before {
-  background: rgba(10, 15, 25, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-/* From Uiverse.io by Galahhad */ 
-.theme-switch {
-  --toggle-size: 30px;
-  /* the size is adjusted using font-size,
-     this is not transform scale,
-     so you can choose any size */
-  --container-width: 5.625em;
-  --container-height: 2.5em;
-  --container-radius: 6.25em;
-  /* radius 0 - minecraft mode :) */
-  --container-light-bg: #3D7EAE;
-  --container-night-bg: #1D1F2C;
-  --circle-container-diameter: 3.375em;
-  --sun-moon-diameter: 2.125em;
-  --sun-bg: #ECCA2F;
-  --moon-bg: #C4C9D1;
-  --spot-color: #959DB1;
-  --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
-  --stars-color: #fff;
-  --clouds-color: #F3FDFF;
-  --back-clouds-color: #AACADF;
-  --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
-  --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
-}
-
-.theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-size: var(--toggle-size);
-}
-
-.theme-switch__container {
-  width: var(--container-width);
-  height: var(--container-height);
-  background-color: var(--container-light-bg);
-  border-radius: var(--container-radius);
-  overflow: hidden;
-  cursor: pointer;
-  -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-  position: relative;
-}
-
-.theme-switch__container::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
-  border-radius: var(--container-radius)
-}
-
-.theme-switch__checkbox {
-  display: none;
-}
-
-.theme-switch__circle-container {
-  width: var(--circle-container-diameter);
-  height: var(--circle-container-diameter);
-  background-color: rgba(255, 255, 255, 0.1);
-  position: absolute;
-  left: var(--circle-container-offset);
-  top: var(--circle-container-offset);
-  border-radius: var(--container-radius);
-  -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-transition: var(--circle-transition);
-  -o-transition: var(--circle-transition);
-  transition: var(--circle-transition);
-  pointer-events: none;
-}
-
-.theme-switch__sun-moon-container {
-  pointer-events: auto;
-  position: relative;
-  z-index: 2;
-  width: var(--sun-moon-diameter);
-  height: var(--sun-moon-diameter);
-  margin: auto;
-  border-radius: var(--container-radius);
-  background-color: var(--sun-bg);
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
-  -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
-  filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
-  overflow: hidden;
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-}
-
-.theme-switch__moon {
-  -webkit-transform: translateX(100%);
-  -ms-transform: translateX(100%);
-  transform: translateX(100%);
-  width: 100%;
-  height: 100%;
-  background-color: var(--moon-bg);
-  border-radius: inherit;
-  -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
-  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-  position: relative;
-}
-
-.theme-switch__spot {
-  position: absolute;
-  top: 0.75em;
-  left: 0.312em;
-  width: 0.75em;
-  height: 0.75em;
-  border-radius: var(--container-radius);
-  background-color: var(--spot-color);
-  -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
-}
-
-.theme-switch__spot:nth-of-type(2) {
-  width: 0.375em;
-  height: 0.375em;
-  top: 0.937em;
-  left: 1.375em;
-}
-
-.theme-switch__spot:nth-last-of-type(3) {
-  width: 0.25em;
-  height: 0.25em;
-  top: 0.312em;
-  left: 0.812em;
-}
-
-.theme-switch__clouds {
-  width: 1.25em;
-  height: 1.25em;
-  background-color: var(--clouds-color);
-  border-radius: var(--container-radius);
-  position: absolute;
-  bottom: -0.625em;
-  left: 0.312em;
-  -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
-  box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
-  -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-  -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-  transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
-}
-
-.theme-switch__stars-container {
-  position: absolute;
-  color: var(--stars-color);
-  top: -100%;
-  left: 0.312em;
-  width: 2.75em;
-  height: auto;
-  -webkit-transition: var(--transition);
-  -o-transition: var(--transition);
-  transition: var(--transition);
-}
-
-/* actions */
-
-.theme-switch__checkbox:checked + .theme-switch__container {
-  background-color: var(--container-night-bg);
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
-  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
-  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
-}
-
-.theme-switch__circle-container:hover {
-  left: calc(var(--circle-container-offset) + 0.187em);
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
-  -webkit-transform: translate(0);
-  -ms-transform: translate(0);
-  transform: translate(0);
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
-  bottom: -4.062em;
-}
-
-.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-}
-
-/* === Navegación más grande y moderna === */
-.nav {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 1.2rem 2rem;
-  font-family: 'Segoe UI', sans-serif;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 72px; /* Más alto */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
-  transition: all 0.4s ease;
-}
-
-body.dark-mode .nav {
-  background: rgba(18, 18, 18, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
-}
-
-.nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.nav-buttons {
-  display: flex;
-  gap: 1.2rem;
-}
-
-.nav-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: white;
-  text-decoration: none;
-  padding: 0.6rem 1.3rem;
-  border-radius: 10px;
-  font-weight: 500;
-  background: rgba(52, 152, 219, 0.3);
-  transition: all 0.3s ease;
-  font-size: 1.05rem;
-}
-
-.nav-btn:hover {
-  background: rgba(52, 152, 219, 0.5);
-  transform: translateY(-2px);
-}
-
-.nav-btn.active {
-  background: rgba(52, 152, 219, 0.8);
-  box-shadow: 0 0 16px rgba(52, 152, 219, 0.6);
-  font-weight: 600;
-}
-
-.nav-icon {
-  font-size: 1.3em;
-}
-
-.nav-right {
-  flex-shrink: 0;
-}
-
-/* === Fondo modo claro: azul cielo con degradado suave === */
-body.light-mode {
-  background: linear-gradient(135deg, 
-    #a8d8f0 0%,   /* Azul cielo claro */
-    #7bb8e0 30%,  /* Azul medio */
-    #5dade2 60%,  /* Azul brillante */
-    #357abd 100%  /* Azul profundo */
-  );
-  background-size: 400% 400%;
-  animation: gradient-shift 18s ease infinite;
-  color: #1a508b;
-}
-
-/* Animación del degradado */
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* === Fondo modo oscuro (tormenta) === */
-body.dark-mode {
-  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 20s ease infinite;
-  color: #e6edf3;
-}
-
-/* === Capa de contraste para texto legible === */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  pointer-events: none;
-}
-
-body.light-mode::before {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-}
-
-body.dark-mode::before {
-  background: rgba(10, 15, 25, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-/* === Relámpagos en modo oscuro (tormenta) === */
-body.dark-mode::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.7), transparent 70%);
-  animation: lightning 8s infinite random-delay;
-}
-
-@keyframes lightning {
-  0%, 98%, 100% { opacity: 0; }
-  97% { opacity: 0.8; }
-}
-
-/* Animación aleatoria de rayos */
-@keyframes random-delay {
-  0% { animation-delay: 0s; }
-  25% { animation-delay: 2s; }
-  50% { animation-delay: 5s; }
-  75% { animation-delay: 8s; }
-  100% { animation-delay: 10s; }
-}
-
-/* === Nubes pasando en modo claro (día) === */
-.cloud {
-  position: fixed;
-  top: 10%;
-  left: -100px;
-  width: 300px;
-  height: 100px;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.8;
-  animation: moveCloud 60s linear infinite;
-  animation-delay: calc(var(--delay) * 10s);
-}
-
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-}
-
-.cloud::before {
-  width: 80px;
-  height: 80px;
-  top: 40px;
-  left: 50px;
-}
-
-.cloud::after {
-  width: 120px;
-  height: 120px;
-  top: 20px;
-  left: 80px;
-}
-
-@keyframes moveCloud {
-  0% { transform: translateX(-100px); }
-  100% { transform: translateX(110vw); }
-}/* === Fondo modo claro: cielo con nubes === */
-body.light-mode {
-  background: linear-gradient(180deg, #a8d8f0 0%, #7bb8e0 30%, #5dade2 70%, #357abd 100%);
-  background-attachment: fixed;
-}
-
-/* === Fondo modo oscuro: tormenta con rayos === */
-body.dark-mode {
-  background: linear-gradient(135deg, #1a2530 0%, #0d1b2a 50%, #0a101f 100%);
-  background-attachment: fixed;
 }
