@@ -55,34 +55,20 @@ document.addEventListener("DOMContentLoaded", () => {
     body.classList.toggle("dark-mode", isDarkMode);
     body.classList.toggle("light-mode", !isDarkMode);
     localStorage.setItem("darkMode", isDarkMode);
+
+    // Actualizar efectos
     updateVisualEffects(isDarkMode);
   }
 
-  // === Efectos visuales ===
+  // === Efectos visuales (partículas o lluvia) ===
   function updateVisualEffects(isDarkMode) {
-    document.querySelectorAll('.particles, .rain, .cloud').forEach(el => el.remove());
+    document.querySelector('.particles')?.remove();
+    document.querySelector('.rain')?.remove();
 
     if (isDarkMode) {
       createRain();
-      createRandomLightning();
     } else {
       createParticles();
-      createClouds();
-    }
-  }
-
-  // === Nubes mejoradas (modo claro) ===
-  function createClouds() {
-    for (let i = 0; i < 6; i++) {
-      const cloud = document.createElement('div');
-      cloud.classList.add('cloud');
-      cloud.style.setProperty('--delay', Math.random());
-      cloud.style.top = (Math.random() * 30 + 10) + 'vh';
-      cloud.style.opacity = 0.7 + Math.random() * 0.3;
-
-      const core = document.createElement('span');
-      cloud.appendChild(core);
-      document.body.appendChild(cloud);
     }
   }
 
@@ -120,26 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(rain);
   }
 
-  // === Rayos aleatorios (modo oscuro) ===
-  function createRandomLightning() {
-    setInterval(() => {
-      if (!body.classList.contains('dark-mode')) return;
-
-      const flash = document.createElement('div');
-      flash.style.cssText = `
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none; z-index: -1; opacity: 0;
-        background: radial-gradient(ellipse at center, rgba(255,255,255,0.9), transparent 70%);
-        animation: 0.3s lightning-flash ease-out forwards;
-      `;
-      flash.style.setProperty('--x', Math.random() * 100 + 'vw');
-      flash.style.setProperty('--y', Math.random() * 60 + 'vh');
-
-      document.body.appendChild(flash);
-      setTimeout(() => flash.remove(), 300);
-    }, Math.random() * 6000 + 4000); // Cada 4-10 segundos
-  }
-
   // === Escuchar cambios en el switch ===
   if (checkbox) {
     checkbox.addEventListener("change", (e) => {
@@ -147,8 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Inicializar efectos ===
-  updateVisualEffects(isDark);
+  // === Inicializar efectos al cargar ===
+  setTheme(isDark); // Esto llama a updateVisualEffects
 
   // === Solo en mqtt.html: conectar a MQTT ===
   if (window.location.pathname.includes("mqtt.html")) {
@@ -217,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
 
-      lastDataTime = Date.now();
+      lastDataTime = Date.now(); // Marcar tiempo del último dato
     });
 
     client.on("error", (err) => {
