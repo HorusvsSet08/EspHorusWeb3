@@ -144,7 +144,7 @@ header h1 {
   text-shadow: 0 0 10px rgba(93, 173, 226, 0.4);
 }
 
-/* === Estado de conexión === */
+/* === Estado de conexión (solo en mqtt.html) === */
 .connection-status-small {
   text-align: center;
   padding: 0.5rem 0;
@@ -222,7 +222,7 @@ body.dark-mode .data-card {
 .data-card span {
   display: block;
   font-size: 1rem;
-  color: #5dade2; /* Títulos en azul claro */
+  color: #5dade2;
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
@@ -231,10 +231,10 @@ body.dark-mode .data-card {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #5dade2; /* Datos en azul claro */
+  color: #5dade2;
 }
 
-/* === Navegación más grande === */
+/* === Navegación === */
 .nav {
   background: rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(14px);
@@ -471,6 +471,21 @@ body.dark-mode .nav {
   top: 50%;
   opacity: 1;
   transform: translateY(-50%) scale(1.1);
+}
+
+/* === Animaciones del switch === */
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+  left: calc(100% - 2.9em + 0.3em);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+  -webkit-transform: translateX(0);
+  -ms-transform: translateX(0);
+  transform: translateX(0);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+  bottom: -4.062em;
 }
 
 /* === Footer === */
