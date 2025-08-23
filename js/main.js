@@ -9,12 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // === Elementos de UI (solo en mqtt.html) ===
-  let connectionStatus = null;
-  let statusText = null;
-  let lastUpdate = null;
-  let lastDataTime = null;
-
   // === Cargar tema guardado ===
   const isDark = localStorage.getItem("darkMode") === "true";
   body.classList.toggle("dark-mode", isDark);
@@ -24,7 +18,12 @@ document.addEventListener("DOMContentLoaded", () => {
     checkbox.checked = isDark;
   }
 
-  // === Crear estado de conexión (solo en mqtt.html) ===
+  // === Estado de conexión (solo en mqtt.html) ===
+  let connectionStatus = null;
+  let statusText = null;
+  let lastUpdate = null;
+  let lastDataTime = null;
+
   if (window.location.pathname.includes("mqtt.html")) {
     connectionStatus = document.createElement('div');
     connectionStatus.className = 'connection-status-small';
@@ -38,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     statusText = connectionStatus.querySelector('.status-text');
     lastUpdate = connectionStatus.querySelector('.last-update');
 
-    // Actualizar tiempo desde último dato
     const updateLastUpdate = () => {
       if (!lastDataTime) {
         lastUpdate.textContent = 'última: nunca';
@@ -50,17 +48,15 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateLastUpdate, 1000);
   }
 
-  // === Aplicar tema y efectos visuales ===
+  // === Aplicar tema ===
   function setTheme(isDarkMode) {
     body.classList.toggle("dark-mode", isDarkMode);
     body.classList.toggle("light-mode", !isDarkMode);
     localStorage.setItem("darkMode", isDarkMode);
-
-    // Actualizar efectos
     updateVisualEffects(isDarkMode);
   }
 
-  // === Efectos visuales (partículas o lluvia) ===
+  // === Efectos visuales ===
   function updateVisualEffects(isDarkMode) {
     document.querySelector('.particles')?.remove();
     document.querySelector('.rain')?.remove();
@@ -72,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // === Partículas (modo claro) ===
   function createParticles() {
     const particles = document.createElement('div');
     particles.classList.add('particles');
@@ -89,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(particles);
   }
 
-  // === Lluvia (modo oscuro) ===
   function createRain() {
     const rain = document.createElement('div');
     rain.classList.add('rain');
@@ -113,10 +107,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // === Inicializar efectos al cargar ===
-  setTheme(isDark); // Esto llama a updateVisualEffects
+  // Inicializar efectos
+  setTheme(isDark);
 
-  // === Solo en mqtt.html: conectar a MQTT ===
+  // === Conexión MQTT (solo en mqtt.html) ===
   if (window.location.pathname.includes("mqtt.html")) {
     if (typeof mqtt === 'undefined') {
       console.error("❌ ERROR: mqtt.js no se ha cargado.");
@@ -183,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
       else if (key === "lluvia") el.textContent = `${value} mm`;
       else el.textContent = value;
 
-      lastDataTime = Date.now(); // Marcar tiempo del último dato
+      lastDataTime = Date.now();
     });
 
     client.on("error", (err) => {
